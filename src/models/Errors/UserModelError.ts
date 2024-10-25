@@ -5,4 +5,16 @@ class UserModelError extends Error {
     }
 }
 
+export class UserModelErrorBadRequest extends UserModelError {
+    constructor(message: string) {
+        super(message);
+        this.name = "UserModelErrorBadRequest";
+    }
+}
+export class UserModelErrorAuth extends UserModelError {
+    constructor(message: string) {
+        super(message);
+        this.name = "UserModelErrorAuth";
+    }
+}
 export default UserModelError;

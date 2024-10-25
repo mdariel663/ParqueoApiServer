@@ -2,9 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import BaseMiddleware from "./BaseMiddleware";
 //import UserModel from "../../models/User/UserModel";
 import UserModel from "../../models/User/UserModel";
-import { ErrorHandler, ErrorCode } from "../HandleErrors";
-import UserModelError from "../../models/Errors/UserModelError";
-import UserErrorHandler from "../errorhandlers/UserErrorHandler";
+import ErrorHandler from "../HandleErrors";
+import UserModelError, { UserModelErrorAuth } from "../../models/Errors/UserModelError";
 //import UserController from "../UserController";
 
 class Middleware extends BaseMiddleware {
@@ -24,12 +23,10 @@ class Middleware extends BaseMiddleware {
         throw new UserModelError("No tienes permisos para acceder a esta información");
       }
      return next();
-    } catch (err: unknown) {
-      console.error("Error en middleware", err);
-      return UserErrorHandler.handleError(res, err, "Ha ocurrido algún error en el servidor...")
+    } catch (err: any) {
+      return ErrorHandler.handleError(res, err, "Ha ocurrido algún error en el servidor...")
     }
   };
-
   onlyAutenticated = async (
     req: Request,
     res: Response,
@@ -37,21 +34,16 @@ class Middleware extends BaseMiddleware {
   ) => {
     try {
       const currentUserId = await this.tokenService.getIdFromHeader(req);
-      if (currentUserId) {
-        req.body.currentUserId = currentUserId;
+      if (!currentUserId) {
+        throw new UserModelErrorAuth("Usuario no autenticado");
       }
-      next();
+      req.body.currentUserId = currentUserId;
+      return next();
     } catch (err: any) {
-      if (
-        err === ErrorCode.TOKEN_NOT_FOUND ||
-        err === ErrorCode.TOKEN_INVALID
-      ) {
-        return ErrorHandler.handleKnownError(res, err);
-      } else {
-        return ErrorHandler.handleError(res, "Error desconocido del servidor");
-      }
+      return ErrorHandler.handleError(res, err, "Error desconocido del servidor");
     }
   };
+  
 }
 
 export default Middleware;
