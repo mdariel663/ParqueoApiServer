@@ -1,27 +1,12 @@
+DROP DATABASE IF EXISTS apiParqueo;
 
-
--- Generando db
-CREATE DATABASE IF NOT EXISTS apiParqueo;
-
--- creando usuario
 CREATE USER 'api_user'@'localhost' IDENTIFIED BY 'api_password';
 GRANT ALL PRIVILEGES ON apiParqueo.* TO 'api_user'@'localhost';
 FLUSH PRIVILEGES;
 
-
-USE apiParqueo;
--- creando usuarios
--- Generando la base de datos
 CREATE DATABASE IF NOT EXISTS apiParqueo;
-
--- Creando el usuario
-CREATE USER 'api_user'@'localhost' IDENTIFIED BY 'api_password';
-GRANT ALL PRIVILEGES ON apiParqueo.* TO 'api_user'@'localhost';
-FLUSH PRIVILEGES;
-
 USE apiParqueo;
 
--- Creando la tabla de usuarios
 CREATE TABLE users (
     id VARCHAR(64) PRIMARY KEY NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -33,45 +18,39 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Creando la tabla de vehículos
 CREATE TABLE vehicles (
-    id VARCHAR(64) PRIMARY KEY NOT NULL,
     make VARCHAR(100) NOT NULL,
     model VARCHAR(100) NOT NULL,
-    plate VARCHAR(20) NOT NULL UNIQUE,
+    plate VARCHAR(20)  PRIMARY KEY NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Creando la tabla de espacios de aparcamiento
 CREATE TABLE parking_spaces (
     id VARCHAR(64) PRIMARY KEY NOT NULL,
-    vehicle_id VARCHAR(64), -- Relación con la tabla vehicles
+    vehicle_id VARCHAR(64), 
     is_available BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE SET NULL
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(plate) ON DELETE SET NULL
 );
 
--- Creando la tabla de reservaciones
 CREATE TABLE reservations (
     id VARCHAR(64) PRIMARY KEY NOT NULL,
     user_id VARCHAR(64) NOT NULL,
     parking_space_id VARCHAR(64) NOT NULL,
-    vehicle_id VARCHAR(64) NOT NULL, -- Relación con la tabla vehicles
+    vehicle_id VARCHAR(64) NOT NULL,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (parking_space_id) REFERENCES parking_spaces(id) ON DELETE CASCADE,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(plate) ON DELETE CASCADE
 );
 
 DELIMITER $$
-
--- Procedimiento para comprobar espacios disponibles
-CREATE PROCEDURE CheckAvailableSpaces(
+CREATE PROCEDURE apiParqueo.CheckAvailableSpaces(
     IN start_time TIMESTAMP,
     IN end_time TIMESTAMP
 )
@@ -84,11 +63,11 @@ BEGIN
         WHERE r.parking_space_id = ps.id
         AND (r.start_time < end_time AND r.end_time > start_time)
     )
-    LIMIT 1;  -- Solo devolver una plaza disponible
+    LIMIT 1;
 END $$
 
--- Procedimiento para agregar una reservación
-CREATE PROCEDURE AddReservation(
+DELIMITER $$
+CREATE PROCEDURE apiParqueo.AddReservation(
     IN reservation_id VARCHAR(64),
     IN user_id VARCHAR(64),
     IN parking_space_id VARCHAR(64),
@@ -99,18 +78,14 @@ CREATE PROCEDURE AddReservation(
 BEGIN
     INSERT INTO reservations (id, user_id, parking_space_id, vehicle_id, start_time, end_time, created_at, updated_at)
     VALUES (reservation_id, user_id, parking_space_id, vehicle_id, start_time, end_time, NOW(), NOW());
-    
-    -- Actualizar la disponibilidad del espacio de aparcamiento
     UPDATE parking_spaces
     SET is_available = FALSE, vehicle_id = vehicle_id, updated_at = NOW()
     WHERE id = parking_space_id;
 END $$
 
--- Procedimiento para obtener la ocupación del parqueo
-
 DELIMITER $$
 
-CREATE PROCEDURE GetParkingOccupancy()
+CREATE PROCEDURE apiParqueo.GetParkingOccupancy()
 BEGIN
     SELECT 
         ps.id AS parking_space_id,
@@ -131,10 +106,9 @@ BEGIN
         ps.id, ps.is_available, v.id;
 END $$
 
-DELIMITER ;
+DELIMITER $$
 
--- Procedimiento para eliminar una reservación
-CREATE PROCEDURE DeleteReservation(
+CREATE PROCEDURE apiParqueo.DeleteReservation(
     IN reservation_id VARCHAR(64),
     IN user_id VARCHAR(64)
 )
@@ -152,7 +126,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM reservations
         WHERE parking_space_id = parking_space_id
-        AND (start_time > NOW() OR end_time > NOW()) -- Solo verificar futuras o actuales reservas
+        AND (start_time > NOW() OR end_time > NOW())
     ) THEN
         UPDATE parking_spaces
         SET is_available = TRUE, vehicle_id = NULL, updated_at = NOW()
@@ -160,28 +134,3 @@ BEGIN
     END IF;
 
 END $$
-
-DELIMITER ;
-
--- Datos de prueba para la base de datos
-INSERT INTO users (id, name, email, password, role, created_at, updated_at) 
-VALUES 
-    ('06fccc91-9353-40ae-a76f-c0b120e980f4', 'Mario', 'mario@gmail.com', '0123456789', 'admin', NOW(), NOW()),
-    ('4a7d5f94-89d2-11ef-9f1a-c4e9840e5334', 'Ana', 'ana@gmail.com', 'password123', 'empleado', NOW(), NOW()),
-    ('4a7d5f94-89d2-11ef-9f1a-c4e9840e5335', 'Luis', 'luis@gmail.com', 'secret123', 'cliente', NOW(), NOW());
-
-INSERT INTO vehicles (id, make, model, plate, created_at, updated_at) 
-VALUES 
-    ('vehicle-1', 'Toyota', 'Corolla', 'XYZ123', NOW(), NOW()),
-    ('vehicle-2', 'Honda', 'Civic', 'ABC456', NOW(), NOW());
-
-INSERT INTO parking_spaces (id, vehicle_id, is_available, created_at, updated_at) 
-VALUES 
-    ('space-1', NULL, TRUE, NOW(), NOW()),
-    ('space-2', NULL, TRUE, NOW(), NOW()),
-    ('space-3', 'vehicle-1', FALSE, NOW(), NOW());  -- Este espacio está reservado
-
-
-INSERT INTO reservations (id, user_id, parking_space_id, vehicle_id, start_time, end_time, created_at, updated_at)
-VALUES 
-    ('reservation-1', '4a7d5f94-89d2-11ef-9f1a-c4e9840e5335', 'space-3', 'vehicle-1', '2024-10-13 22:30:00', '2024-10-13 23:30:00', NOW(), NOW());
