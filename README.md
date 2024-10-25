@@ -37,6 +37,8 @@ npm start
 
 La documentación del API se encuentra disponible en el archivo `docs/API_DOCS.md`.
 
+La gestion de session para postman esta automatizada. Luego de iniciar session el empieza a obtener el token de respuesta para las proximas peticiones
+
 
 # Posibles errores
    1.  Si se produce un error de permisos, ejecutar el siguiente comando para corregirlo:
