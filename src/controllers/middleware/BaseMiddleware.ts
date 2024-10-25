@@ -8,7 +8,7 @@ export default class BaseMiddleware implements IMiddleware {
     protected readonly tokenService: ITokenModel,
     protected readonly dbSql: IDatabase
   ) {
-    console.log("Middleware Inicaliced ...");
+    console.log("Middleware Iniciatialized ...");
   }
   
   authorizeAdmin(req: Request, res: Response, next: NextFunction): void {
