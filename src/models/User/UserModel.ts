@@ -37,18 +37,20 @@ class UserModel {
   }
 
   async checkLogin(
-    emailRequest: EmailRequest,
+    credentialRequest: EmailRequest | PhoneRequest,
     passwordRequest: PasswordRequest
   ): Promise<any> {
-    const [result] = await this.db.get(
-      "SELECT id, password FROM users WHERE email = ?",
-      [emailRequest.email]
-    );
-    // Por cuestion de seguridad no se especifica si es el email o el password el que esta mal: throw new UserModelError("El usuario no existe en el sistema");
+    const isEmail = credentialRequest instanceof EmailRequest;
+    const paramType = isEmail ? "email" : "phone";
+    const value = isEmail ? credentialRequest.email : (credentialRequest as PhoneRequest).phone;
+  
+    const query = `SELECT id, password FROM users WHERE ${paramType} = ?`;
+    const [result] = await this.db.get(query, [value]);
+    
+    
+
     if (!result) return null;
-    const isPasswordValid = await passwordRequest.verifyPassword(
-      result.password
-    );
+    const isPasswordValid = await passwordRequest.verifyPassword( result.password );
 
     if (isPasswordValid) {
       const token = new TokenService();
