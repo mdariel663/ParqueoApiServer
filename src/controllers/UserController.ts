@@ -28,16 +28,17 @@ class UserController {
 
   static create = async (req: express.Request, resp: express.Response) => {
     try {
-      const { name, email, phone, password, role } = req.body;
-      let roleObject = role;
-
+      const { name, email, phone, password, roleObject } = req.body;
+      let role: string | undefined = roleObject;
       const validationError = validateFields({ name, email, phone, password});
+
       if (validationError)
         return ErrorHandler.handleError(resp, validationError, 400);
-      
+
       const validationRolError = validateFields({role});
-      if (roleObject === undefined) {
-        roleObject = "cliente";
+
+      if (role === undefined) {
+        role = "cliente";
       }else if (validationRolError) {
         return ErrorHandler.handleError(resp, validationRolError, 400);
       }
@@ -46,7 +47,7 @@ class UserController {
         email,
         phone,
         password,
-        role: roleObject
+        role
       });
       return resp.status(200).send(result);
     } catch (err: unknown) {
@@ -98,9 +99,7 @@ class UserController {
         value: string,
         field: ValidatedDataKeys
       ) => {
-        console.log("value", value);
         const request = new RequestClass(value);
-        console.warn("request", request);
 
         if (!request.isValid) {
           throw new UserModelError(request.messageError);

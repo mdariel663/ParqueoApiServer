@@ -35,7 +35,6 @@ class UserService {
                 throw new UserModelError(requestData[key].messageError);
             }
         });
-        
 
         const user = await userModel.create(requestData);
         return { success: true, user };
