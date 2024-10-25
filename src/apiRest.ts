@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express, { Request, Response , NextFunction} from "express";
 import cors from "cors"
+import MiddlewareErrorHandler from "./controllers/middleware/MiddlewareErrors";
 dotenv.config();
 
 const app = express();
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(cors())
 app.use(MiddlewareErrorHandler)
 // agregar rutas
-
+try{
   app.listen(port, () => {
     console.log(`Servidor corriendo en puerto ${port}`);
   });
