@@ -1,15 +1,15 @@
 import express from "express";
 import UserService from "../services/UserService";
-import { ErrorHandler } from "./HandleErrors";
+import  ErrorHandler  from "./HandleErrors";
 import { validateFields } from "./Utils";
 import EmailRequest from "../models/User/EmailRequest";
 import PasswordRequest from "../models/User/PasswordRequest";
 import UserNameRequest from "../models/User/UserNameRequest";
 import RoleRequest from "../models/User/RoleRequest";
 import UserModel from "../models/User/UserModel";
-import UserModelError from "../models/Errors/UserModelError";
-import UserErrorHandler from "./errorhandlers/UserErrorHandler";
+import UserModelError, { UserModelErrorBadRequest } from "../models/Errors/UserModelError";
 import PhoneRequest from "../models/User/PhoneRequest";
+
 
 class UserController {
   static delete = async (req: express.Request, resp: express.Response) => {
@@ -17,8 +17,8 @@ class UserController {
       const { currentUserId, userId } = req.body;
       const result = await UserService.deleteUser(currentUserId, userId);
       return resp.status(200).send(result);
-    } catch (err: unknown) {
-      return UserErrorHandler.handleError(
+    } catch (err: any) {
+      return ErrorHandler.handleError(
         resp,
         err,
         "Error al eliminar usuario"
@@ -28,30 +28,30 @@ class UserController {
 
   static create = async (req: express.Request, resp: express.Response) => {
     try {
-      const { name, email, phone, password, roleObject } = req.body;
-      let role: string | undefined = roleObject;
+      const { name, email, phone, password, role } = req.body;
+      let roleObject: string  = role;
       const validationError = validateFields({ name, email, phone, password});
 
       if (validationError)
-        return ErrorHandler.handleError(resp, validationError, 400);
-
+        throw new UserModelErrorBadRequest(validationError);
+      
       const validationRolError = validateFields({role});
 
       if (role === undefined) {
-        role = "cliente";
+        roleObject = "cliente";
       }else if (validationRolError) {
-        return ErrorHandler.handleError(resp, validationRolError, 400);
+        throw new UserModelError(validationRolError);
       }
       const result = await UserService.createUser({
         name,
         email,
         phone,
         password,
-        role
+        role:roleObject!
       });
       return resp.status(200).send(result);
-    } catch (err: unknown) {
-      return UserErrorHandler.handleError(resp, err, "Error al crear usuario");
+    } catch (err: any) {
+      return ErrorHandler.handleError(resp, err, "Error al crear usuario");
     }
   };
   static update = async (req: express.Request, resp: express.Response) => {
@@ -69,18 +69,12 @@ class UserController {
       const model = new UserModel();
       const user = await model.getCurrentUser(currentUserId);
 
-      // Validar si el rol puede ser modificado
-      const isModificableRole =
-        !reqUserId ||
-        currentUserId === reqUserId ||
-        new RoleRequest(user.role).role === "admin";
-
+      let isModificableRole = false
+      if (user.role === "admin"){
+        isModificableRole = true;
+      }
       if (!isModificableRole && role !== undefined) {
-        return ErrorHandler.handleError(
-          resp,
-          "No se puede modificar el rol de un usuario que no es administrador",
-          403
-        );
+        throw new UserModelError("No se puede modificar el rol de un usuario que no es administrador")
       }
 
       const validatedData: {
@@ -133,12 +127,8 @@ class UserController {
           ...validatedData,
           success: result.affectedRows > 0,
         });
-    } catch (err: unknown) {
-      return UserErrorHandler.handleError(
-        resp,
-        err,
-        "Error al actualizar usuario"
-      );
+    } catch (err: any) {
+      return ErrorHandler.handleError(resp, err, "Error al actualizar usuario", 500);
     }
   };
 
@@ -147,8 +137,8 @@ class UserController {
       const { currentUserId } = req.body;
       const result = await UserService.getCurrentUser(currentUserId);
       return resp.status(200).send({ success: true, ...result });
-    } catch (err) {
-      return UserErrorHandler.handleError(
+    } catch (err: any) {
+      return ErrorHandler.handleError(
         resp,
         err,
         "Error al obtener usuario"
@@ -160,24 +150,18 @@ class UserController {
     try {
       const result = await UserService.getUsers();
       return resp.status(200).send(result);
-    } catch (err) {
-      if (err instanceof UserModelError) {
-        return ErrorHandler.handleError(resp, err.message, 400);
-      }
-      return ErrorHandler.handleError(resp, "Error al obtener usuarios", 500);
+    } catch (err: any) {
+      return ErrorHandler.handleError(resp, err, "Error al obtener usuarios", 500);
     }
   };
 
   static login = async (req: express.Request, resp: express.Response) => {
     try {
-      const { email, password } = req.body;
-      const result = await UserService.loginUser(email, password);
+      const { email, phone , password } = req.body;
+      const result = await UserService.loginUser(email, phone, password);
       return resp.status(200).send(result);
-    } catch (err: unknown) {
-      if (err instanceof UserModelError) {
-        return ErrorHandler.handleError(resp, err.message, 400);
-      }
-      return ErrorHandler.handleError(resp, "Error interno del servidor", 500);
+    } catch (err: any) {
+      return ErrorHandler.handleError(resp, err, "Error interno del servidor", 500);
     }
   };
 }
