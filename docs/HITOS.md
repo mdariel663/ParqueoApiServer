@@ -1,8 +1,8 @@
-* [ ] ========= Usuario ===========
-* [ ] \- Implementar cosas de usuario
-* [ ] \- Implementar cosas de email
-* [ ] \- Implementar cosas de password
-* [ ] \- Implementar cosas de role
+* [x] ========= Usuario ===========
+* [x] \- Implementar cosas de usuario
+* [x] \- Implementar cosas de email
+* [x] \- Implementar cosas de password
+* [x] \- Implementar cosas de role
 * [ ] ========= Parqueo ===========
 * [ ] \- Implementar cosas de parqueo
 * [ ] \- Crear la entidad Parqueo
@@ -14,19 +14,18 @@
 * [ ] ========== Otros ==============
 * [ ] \- Implementar cosas de log
 * [x] \- Implementar cosas de token JWT\.
-* [ ] \- La aplicación debe tener un sistema de autorización basado en roles\. Los roles serán
+* [x] \- La aplicación debe tener un sistema de autorización basado en roles\. Los roles serán
 "admin", "empleado" y "cliente".
 * [ ] \- La aplicación debe permitir la creación\, lectura\, actualización y eliminación de entidades a
 través de la API.
 * [ ] \- Acceder a los logs del parking: un administrador desea acceder a los logs de actividad del
 parking para conocer el historial de reservas, cancelaciones, entradas y salidas de vehículos,
 etc.
-* [ ] \- El administrador hace una solicitud GET a la API para obtener los registros de actividad del parking\.
-* [ ] \- La API verifica que el usuario tenga los permisos adecuados para acceder a los registros y devuelve una respuesta con los registros de actividad del parking\.
-* [ ] \- La aplicación debe tener un sistema de autenticación basado en JWT\.
-* [ ] Registros y devuelve una respuesta con los registros de actividad del parking.
-* [ ] \- La aplicación debe tener un sistema de autorización basado en roles\. Los roles serán
-* [ ] "admin", "empleado" y "cliente".
+* [x] \- El administrador hace una solicitud GET a la API para obtener los registros de actividad del parking\.
+* [x] \- La API verifica que el usuario tenga los permisos adecuados para acceder a los registros y devuelve una respuesta con los registros de actividad del parking\.
+* [x] \- La aplicación debe tener un sistema de autenticación basado en JWT\.
+* [x] Registros y devuelve una respuesta con los registros de actividad del parking.
+* [x] \- La aplicación debe tener un sistema de autorización basado en roles\. Los roles serán "admin"\, "empleado" y "cliente"\.
 * [ ] \- La aplicación debe tener pruebas e2e automatizadas para los 3 casos de uso
 * [ ] \- Documentación técnica en postman\.
 * [ ] \- Coleccion de postman para los endpoints de la aplicación
