@@ -2,9 +2,9 @@ import ITokenModel from "../models/ITokenModel";
 import { Request } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { UUID } from "crypto";
-import { ErrorCode } from "../controllers/HandleErrors";
 import dotenv from "dotenv";
 import { exit } from "process";
+import TokenModelError from "../models/Errors/TokenModelError";
 
 dotenv.config();
 
@@ -26,7 +26,7 @@ class TokenService implements ITokenModel {
     return new Promise<UUID>((resolve, reject) => {
       this.verifyToken(tokenRequest)
         .then((tokenData) => resolve(tokenData?.id))
-        .catch((err) => reject(err));
+        .catch((err) => {throw new TokenModelError(err.message)});
     });
   }
 
@@ -43,15 +43,14 @@ class TokenService implements ITokenModel {
   }
 
   verifyToken = async (token: string | undefined): Promise<JwtPayload> =>
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
       if (!token) {
-        reject(ErrorCode.TOKEN_NOT_FOUND);
-        return;
+        throw new TokenModelError("Usuario no autenticado")
       }
 
       jwt.verify(token, this.secretKey!, (err, decoded) => {
         if (err) {
-          reject(ErrorCode.TOKEN_INVALID);
+          throw new TokenModelError("Usuario no autenticado")
         } else {
           resolve(decoded as JwtPayload);
         }
