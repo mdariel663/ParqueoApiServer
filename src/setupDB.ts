@@ -4,8 +4,7 @@ import mysql from 'mysql2/promise'
 import dotenv from 'dotenv'
 
 dotenv.config()
-const { DBHOST_MYSQL_DEFAULT, DBUSER_MYSQL_DEFAULT, DBPASSWORD_MYSQL_DEFAULT } =
-  process.env
+const { DBHOST_MYSQL_DEFAULT, DBUSER_MYSQL_DEFAULT, DBPASSWORD_MYSQL_DEFAULT } = process.env
 
 const dbConfig = {
   host: DBHOST_MYSQL_DEFAULT,
@@ -13,27 +12,21 @@ const dbConfig = {
   password: DBPASSWORD_MYSQL_DEFAULT
 }
 
-const setupDatabase = async () => {
-  // try {
+const setupDatabase = async (): Promise<void> => {
   console.log('=============== Datos ingresados ===============')
   console.log('Config: ', dbConfig)
-  // Crear conexión a la base de datos
-  await mysql
-    .createConnection(dbConfig)
+
+  await mysql.createConnection(dbConfig)
     .then(async (conn) => {
       console.log('Conexión a la base de datos establecida')
-
-      // Leer el archivo setupdb.sql
       const sqlFilePath = path.join(__dirname, 'setupdb.sql')
       const sql = fs.readFileSync(sqlFilePath, 'utf-8')
 
-      // Dividir el archivo en líneas de comandos SQL
-      const sqlStatements = sql
+      const sqlStatements: string[] = sql
         .split(';')
         .map((statement) => statement.trim())
         .filter((statement) => statement.length > 0)
 
-      // Ejecutar cada línea de comando
       for (const statement of sqlStatements) {
         console.log(`Ejecutando: ${statement}`)
         await conn.query(statement)
@@ -43,31 +36,25 @@ const setupDatabase = async () => {
       await conn.end()
     })
     .catch((err) => {
-      const { code, message } = err
-      switch (code) {
+      if (err.code !== undefined) {
+        return
+      }
+      switch (err.code) {
         case 'ER_ACCESS_DENIED_ERROR':
-          console.error(
-            '⚠️ Acceso denegado: Revisa tus credenciales de base de datos en el archivo .env. Puede que necesites permisos de root o verificar el nombre de usuario y contraseña.'
-          )
+          console.error('⚠️ Acceso denegado: Revisa tus credenciales de base de datos en el archivo .env. Puede que necesites permisos de root o verificar el nombre de usuario y contraseña.')
           break
         case 'ER_ACCESS_DENIED_NO_PASSWORD_ERROR':
-          console.error(
-            '⚠️ Acceso denegado: Parece que la contraseña no se proporcionó. Verifica que el campo DBPASSWORD_MYSQL_DEFAULT en el archivo .env no esté vacío.'
-          )
+          console.error('⚠️ Acceso denegado: Parece que la contraseña no se proporcionó. Verifica que el campo DBPASSWORD_MYSQL_DEFAULT en el archivo .env no esté vacío.')
           break
         case 'ENOTFOUND':
-          console.error(
-            '⚠️ Error de conexión: No se pudo encontrar el host especificado. Revisa que DBHOST_MYSQL_DEFAULT esté correcto en el archivo .env.'
-          )
+          console.error('⚠️ Error de conexión: No se pudo encontrar el host especificado. Revisa que DBHOST_MYSQL_DEFAULT esté correcto en el archivo .env.')
           break
         default:
-          console.error(`⚠️ Error configurando la base de datos: ${message}`)
+          console.error('⚠️ Error configurando la base de datos: ', typeof err.message === 'string' ? err.message : 'Error desconocido')
       }
     })
-
-  // } catch (error) {
-
-  //  }
 }
 
-setupDatabase()
+setupDatabase().catch(e => {
+  console.error('Se ha producido un error')
+})
