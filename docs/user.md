@@ -219,7 +219,6 @@ Authorization: Bearer <token>
 
 #### Consideraciones:
 * El usuario tiene que ser administrador para acceder a esta ruta o el usuario tiene que ser el mismo que el actual.
-
 ##### Parametros:
 
 * **userId** (opcional y solo puede ser actualizado por el usuario administrador): Id del usuario.
@@ -228,7 +227,7 @@ Authorization: Bearer <token>
 * **phone** (opcional): Numero de telefono del usuario.
 * **password** (opcional): Contraseña del usuario.
 * **role** (opcional, solo puede ser actualizado por el usuario administrador): Rol del usuario.
-
+// TODO: verificar si un email es valido pero el phone no lo es 
 ##### Solicitud
 
 ```json
@@ -247,7 +246,8 @@ Código: **200 OK** \| Ejemplo de Respuesta:
 
 ```json
 { 
-  "success": boolean(true),
+  "message": "Usuario actualizado con éxito",
+  "success": true,
   "name": "string",
   "email": "string",
   "phone": "string",
