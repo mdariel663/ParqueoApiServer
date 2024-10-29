@@ -1,62 +1,70 @@
-import TokenService from "../../services/TokenService";
-import { randomUUID, UUID } from "crypto";
-import IDatabase from "../Database/IDatabase";
-import EmailRequest from "./EmailRequest";
-import PasswordRequest from "./PasswordRequest";
-import RoleRequest from "./RoleRequest";
-import UserNameRequest from "./UserNameRequest";
-import controllers from "../../controllers/controllers";
-import UserModelError from "../Errors/UserModelError";
-import PhoneRequest from "./PhoneRequest";
+import TokenService from '../../services/TokenService'
+import { randomUUID, UUID } from 'crypto'
+import IDatabase from '../Database/IDatabase'
+import EmailRequest from './EmailRequest'
+import PasswordRequest from './PasswordRequest'
+import RoleRequest from './RoleRequest'
+import UserNameRequest from './UserNameRequest'
+import controllers from '../../controllers/controllers'
+import UserModelError from '../Errors/UserModelError'
+import PhoneRequest from './PhoneRequest'
+import FilterModel from '../FilterModel'
+import User from './UserInterface'
+export class UserFilterModel extends FilterModel { }
 
 class UserModel {
   constructor(
     private readonly db: IDatabase = controllers.databaseRepository
-  ) {}
+  ) { }
 
   async getUsers() {
     return await this.db.all(
-      "SELECT id, name, email, role, created_at, updated_at FROM users ORDER BY updated_at",
+      'SELECT id, name, email, role, created_at, updated_at FROM users ORDER BY updated_at',
       []
-    );
+    )
   }
+
   async getCurrentUser(userId: UUID) {
     const [user] = await this.db.get(
-      "SELECT name, email, phone, role, created_at, updated_at FROM users WHERE id = ?",
+      'SELECT name, email, phone, role, created_at, updated_at FROM users WHERE id = ?',
       [userId]
-    );
-    if (!user) throw new UserModelError("Usuario sin permisos o innexistente");
-    return user;
+    )
+    if (!user) throw new UserModelError('Usuario sin permisos o innexistente')
+    return user
   }
 
-  async getUserById(userId: UUID) {
-    const user = await this.db.get("SELECT * FROM users WHERE id = ?", [
-      userId,
-    ]);
-    return user ? user[0] : null;
-  }
-
-  async checkLogin(
-    credentialRequest: EmailRequest | PhoneRequest,
-    passwordRequest: PasswordRequest
-  ): Promise<any> {
-    const isEmail = credentialRequest instanceof EmailRequest;
-    const paramType = isEmail ? "email" : "phone";
-    const value = isEmail ? credentialRequest.email : (credentialRequest as PhoneRequest).phone;
-  
-    const query = `SELECT id, password FROM users WHERE ${paramType} = ?`;
-    const [result] = await this.db.get(query, [value]);
-    
-    
-
-    if (!result) return null;
-    const isPasswordValid = await passwordRequest.verifyPassword( result.password );
-
-    if (isPasswordValid) {
-      const token = new TokenService();
-      return { id: result.id, token: token.generateToken(result.id) };
+  async getUserById(userId: UUID | undefined): Promise<User | null> {
+    if (userId === undefined) {
+      throw new UserModelError('ID de usuario no proporcionado');
+    }
+    const user = await this.db.get('SELECT * FROM users WHERE id = ?', [userId]);
+    if (user instanceof Array) {
+      return user[0] || null; // Retorna null si no se encuentra el usuario
     }
     return null;
+  }
+  async checkLogin(
+    credentialRequest: EmailRequest | PhoneRequest | null,
+    passwordRequest: PasswordRequest
+  ): Promise<any> {
+    if (credentialRequest === null) {
+      return null
+    }
+    const isEmail = credentialRequest instanceof EmailRequest
+    const paramType = isEmail ? 'email' : 'phone'
+    const value = isEmail ? credentialRequest.email : (credentialRequest).phone
+
+    const query = `SELECT id, password FROM users WHERE ${paramType} = ?`
+    const [result] = await this.db.get(query, [value])
+
+    if (!result) return null
+    const isPasswordValid = await passwordRequest.verifyPassword(result.password)
+
+    if (isPasswordValid) {
+      const token = new TokenService()
+      return { id: result.id, token: token.generateToken(result.id) }
+    }
+    return null
   }
 
   async create({
@@ -64,7 +72,7 @@ class UserModel {
     email,
     phone,
     password,
-    role,
+    role
   }: {
     name: UserNameRequest;
     email: EmailRequest;
@@ -75,70 +83,90 @@ class UserModel {
     const userId = randomUUID();
     try {
       await this.db.run(
-        "INSERT INTO users (id, name, email, phone, password, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
+        'INSERT INTO users (id, name, email, phone, password, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())',
         [
           userId,
           name.name,
           email.email,
           phone.phone,
           await password.encryptPassword(),
-          role.role,
+          role.role
         ]
       );
       return { id: userId, name: name.name, email: email.email, phone: phone.phone };
     } catch (error: any) {
-      if (error?.code === "ER_DUP_ENTRY")
-        throw new UserModelError("El usuario ya existe");
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new UserModelError('El usuario ya existe');
+      }
       throw error;
     }
+  }
+
+
+
+  async findUserByFilter(user: string, password: string, filterModel: FilterModel): Promise<User | null> {
+    console.error('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', filterModel.getFieldsToSelect())
+    const result = await this.db.get(
+      `SELECT ${filterModel.getFieldsToSelect()} FROM users WHERE email = ? OR phone = ?`,
+      [user, password]
+    );
+
+    return result; //Return userId is found
   }
 
   async updateUser(
     userId: UUID,
     userData: {
-      name?: string;
-      email?: string;
-      phone?: string;
-      password?: string;
-      role?: string;
+      name?: string
+      email?: string
+      phone?: string
+      password?: string
+      role?: string
     }
   ) {
-    const fieldsToUpdate: string[] = [];
-    const values: any[] = [];
+    const fieldsToUpdate: string[] = []
+    const values: any[] = []
 
     if (userData.name !== undefined) {
-      fieldsToUpdate.push("name = ?");
-      values.push(userData.name);
+      fieldsToUpdate.push('name = ?')
+      values.push(userData.name)
     }
     if (userData.email !== undefined) {
-      fieldsToUpdate.push("email = ?");
-      values.push(userData.email);
+      fieldsToUpdate.push('email = ?')
+      values.push(userData.email)
     }
     if (userData.password !== undefined) {
-      fieldsToUpdate.push("password = ?");
-      values.push(userData.password);
+      fieldsToUpdate.push('password = ?')
+      values.push(userData.password)
     }
     if (userData.role !== undefined) {
-      fieldsToUpdate.push("role = ?");
-      values.push(userData.role);
+      fieldsToUpdate.push('role = ?')
+      values.push(userData.role)
     }
     if (userData.phone !== undefined) {
-      fieldsToUpdate.push("phone = ?");
-      values.push(userData.phone);
+      fieldsToUpdate.push('phone = ?')
+      values.push(userData.phone)
     }
 
     if (fieldsToUpdate.length === 0) {
-      return null;
+      return null
     }
 
-    const query = `UPDATE users SET ${fieldsToUpdate.join(", ")} WHERE id = ?`;
-    values.push(userId);
-    return await this.db.run(query, values);
+    const query = `UPDATE users SET ${fieldsToUpdate.join(', ')} WHERE id = ?`
+    values.push(userId)
+    return await this.db.run(query, values)
   }
 
-  async deleteUser(userId: UUID) {
-    return await this.db.run("DELETE FROM users WHERE id = ?", [userId]);
+  // async deleteUser(userId: UUID) {
+  //  return await this.db.run('DELETE FROM users WHERE id = ?', [userId])
+  //}
+
+  async deleteUser(userId: UUID): Promise<void> {
+    const result = await this.db.run('DELETE FROM users WHERE id = ?', [userId]);
+    if (result.affectedRows === 0) {
+      throw new UserModelError('Usuario no encontrado para eliminar');
+    }
   }
 }
 
-export default UserModel;
+export default UserModel
