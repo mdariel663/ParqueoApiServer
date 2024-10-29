@@ -18,7 +18,7 @@ Código: **401 Unauthorized** \| Ejemplo de Respuesta:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Usuario no autenticado"
 }
 ```
@@ -27,7 +27,7 @@ Código: **400 Bad Request** \| Ejemplo de Respuesta:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Datos JSON mal estructurados"
 }
 ```
@@ -36,7 +36,7 @@ Código: **500 Internal Server Error** \| Ejemplo de Respuesta:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Error al obtener el usuario."
 }
 ```
@@ -44,12 +44,9 @@ Código: **500 Internal Server Error** \| Ejemplo de Respuesta:
 ## GET / - Obtener Usuario Actual
 
 ###### Descripción:
-
 Recupera los datos del usuario autenticado.
-
-###### Autenticación:
-
-Requiere que el usuario esté autenticado mediante el token en el header de tipo "Bearer".
+###### Headers: 
+Authorization: Bearer <token>
 
 ###### Respuesta Exitosa:
 
@@ -58,12 +55,12 @@ Código: 200 OK \| Ejemplo de Respuesta:
 ```json
 {
   "success": true,
-  "name": "Nombre del Usuario",
-  "email": "[usuario@ejemplo.com](mailto:usuario@ejemplo.com)",
-  "phone": "+5312345678"
-  "role": "rol_usuario",
-  "created_at": "2023-01-01T12:00:00Z",
-  "updated_at": "2023-10-01T12:00:00Z"
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "role": "string",
+  "created_at": "string", // formato ISO 8601: EJ: "2023-10-01T12:00:00Z"
+  "updated_at": "string" // formato ISO 8601: EJ: "2023-10-01T12:00:00Z"
 }
 ```
 
@@ -75,7 +72,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Usuario no autenticado"
 }
 ```
@@ -84,7 +81,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Datos JSON mal estructurados"
 }
 ```
@@ -93,7 +90,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Error al obtener el usuario."
 }
 ```
@@ -119,23 +116,15 @@ Código: 200 OK \| Ejemplo de Respuesta:
 ```json
 [
   {
-    "id": "uuid",
-    "name": "Nombre del Usuario",
-    "email": "usuario@ejemplo.com",
-    "phone": "+5312345678",
-    "role": "rol_usuario",
-    "created_at": "2023-01-01T12:00:00Z",
-    "updated_at": "2023-10-01T12:00:00Z"
+    "id": "UUID",
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "role": "string",
+    "created_at": "string", // formato ISO 8601: EJ: "2023-10-01T12:00:00Z"
+    "updated_at": "string" // formato ISO 8601: EJ: "2023-10-01T12:00:00Z"
   },
-  {
-    "id": "uuid",
-    "name": "Nombre del Usuario",
-    "email": "usuario@ejemplo.com",
-    "phone": "+5312345678",
-    "role": "rol_usuario",
-    "created_at": "2023-01-01T12:00:00Z",
-    "updated_at": "2023-10-01T12:00:00Z"
-  }
+  ...
 ]
 ```
 
@@ -146,26 +135,17 @@ Código: 200 OK \| Ejemplo de Respuesta:
 Crea un nuevo usuario en el sistema.
 
 ##### Autenticación:
-
+(Puesto asi como modo de prueba, pero en produccion se deberia requerir autenticacion del administrador)
 No requiere autenticación previa.
-
-##### Parametros:
-
-* **name** (obligatorio): Nombre del usuario.
-* **email** (obligatorio): Email del usuario.
-* **phone** (obligatorio): Numero de telefono del usuario.
-* **password** (obligatorio): Contraseña del usuario.
-* **role** (opcional, si se deja sin definir se asignara el rol "cliente"): Rol del usuario.
-
 ##### Solicitud
 
 ```json
 {
-  "name": "Nombre del Usuario",
-  "email": "usuario@ejemplo.com",
-  "phone": "+5312345678",
-  "password": "password123",
-  "role": "rol_usuario"
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "password": "string",
+  "role": "string" // opcional, si se deja sin definir se asignara el rol "cliente"
 }
 ```
 
@@ -175,14 +155,16 @@ Código: **200 OK** \| Ejemplo de Respuesta:
 
 ```json
 {
-    "success": true,
-    "user": {
-        "id": "7c566b61-479e-4321-9ff7-73fc64094d43",
-        "name": "Analis Rumanir",
-        "email": "51rumain123@gmail.com",
-        "phone": "+5312345678"
-    }
+  "success": boolean(true),
+  "user": {
+    "id": "UUID",
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "role": "string"
+  }
 }
+
 ```
 
 ###### Respuesta Fallida:
@@ -194,7 +176,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Usuario no autenticado"
 }
 ```
@@ -203,7 +185,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Datos JSON mal estructurados"
 }
 ```
@@ -221,7 +203,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Error al obtener el usuario."
 }
 ```
@@ -232,11 +214,10 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 Actualiza los datos del usuario autenticado.
 
-##### Autenticación:
+##### Headers:
+Authorization: Bearer <token>
 
-Requiere que el usuario esté autenticado mediante el token en el header de tipo "Bearer"
-Consideraciones:
-
+#### Consideraciones:
 * El usuario tiene que ser administrador para acceder a esta ruta o el usuario tiene que ser el mismo que el actual.
 
 ##### Parametros:
@@ -252,10 +233,11 @@ Consideraciones:
 
 ```json
 { 
-    "name": "Felipe Novoa", 
-    "email": "felipe123@gmail.com",
-    "phone": "+5312345678",
-    "role": "admin"
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "password": "string",
+    "role": "string" // opcional, solo puede ser actualizado por el usuario administrador
 }
 ```
 
@@ -264,14 +246,14 @@ Consideraciones:
 Código: **200 OK** \| Ejemplo de Respuesta:
 
 ```json
-{
-  "success": true,
-  "name": "Nombre del Usuario",
-  "email": "usuario@ejemplo.com",
-  "phone": "+5312345678",
-  "role": "rol_usuario",
-  "created_at": "2023-01-01T12:00:00Z",
-  "updated_at": "2023-10-01T12:00:00Z"
+{ 
+  "success": boolean(true),
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "role": "string",
+  "created_at": "string", // formato ISO 8601: EJ: "2023-10-01T12:00:00Z"
+  "updated_at": "string" // formato ISO 8601: EJ: "2023-10-01T12:00:00Z"
 }
 ```
 
@@ -284,7 +266,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Usuario no autenticado"
 }
 ```
@@ -293,7 +275,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Datos JSON mal estructurados"
 }
 ```
@@ -311,7 +293,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Error al obtener el usuario."
 }
 ```
@@ -335,7 +317,7 @@ userId (opcional, solo puede ser eliminado por el usuario administrador): Id del
 
 ```json
 {
-    "userId": "f63da58c-0c5b-4835-8d4c-6d225a7450aa"
+    "userId": "UUID"
 }
 ```
 
@@ -358,7 +340,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Usuario no autenticado"
 }
 ```
@@ -367,7 +349,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Datos JSON mal estructurados"
 }
 ```
@@ -376,7 +358,7 @@ Codigo: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ```json
 {
-  "success": false,
+  "success": boolean(false),
   "message": "Error al obtener el usuario."
 }
 ```
