@@ -10,5 +10,22 @@
     "rootDir": "./src",
     "noImplicitReturns": true
   },
-  "include": ["src/**/*.ts"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "typeRoots": [
+    "node_modules/@types",
+    "src/types"
+  ],
+  "types": [
+    "node",
+    "jest"
+  ],
+  "moduleResolution": "node",
+  "resolveJsonModule": true,
+  "baseUrl": ".",
+  "include": [
+    "src/**/*.ts"
+  ]
 }
