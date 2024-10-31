@@ -1,9 +1,9 @@
 export interface FilterAbstractModel {
     getFilters: () => {
-        [key: string]: any;
+        [key: string]: unknown;
     };
     getFieldsToSelect: () => string;
-    getValuesToSelect: (nameIs: string) => any;
+    getValuesToSelect: (nameIs: string) => unknown;
 
 }
 
@@ -14,19 +14,19 @@ export default class FilterModel implements FilterAbstractModel {
         }
     }
 
-    getFieldsToSelect = () => {
+    getFieldsToSelect = (): string => {
         return Object.keys(this.filters).join(', ');
     };
 
 
-    getValuesToSelect = (nameIs: string): any[] => {
+    getValuesToSelect = (nameIs: string): unknown[] => {
         return Object.entries(this.filters)
             .filter(([key]) => key === nameIs)
             .map(([, value]) => value);
     };
 
 
-    getFilters = () => {
+    getFilters = (): {} => {
         return this.filters;
     };
 }

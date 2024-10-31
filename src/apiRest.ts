@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import express, { Request, Response, NextFunction } from 'express'
+import express from 'express'
 import cors from 'cors'
 
 import MiddlewareErrorHandler from './controllers/middleware/MiddlewareErrors'
@@ -9,9 +9,10 @@ import LogRouter from './routes/logs'
 import UserRouter from './routes/user'
 import ParkingRouter from './routes/parking'
 dotenv.config()
+const { PORT_SERVER } = process.env
 
 const app = express()
-const port = process.env.PORT_SERVER ? process.env.PORT_SERVER : 8000
+const port = PORT_SERVER ?? 8000
 
 app.use(express.json())
 app.use(cors())
