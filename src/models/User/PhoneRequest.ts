@@ -2,8 +2,8 @@ export default class PhoneRequest {
   public messageError: string = ''
   public isValid: boolean = true
 
-  constructor (public phone: string | undefined) {
-    if (phone === undefined) {
+  constructor(public phone: string | null) {
+    if (phone === null) {
       this.isValid = false
       this.messageError = 'El campo phone es obligatorio'
       return

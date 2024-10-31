@@ -9,14 +9,44 @@ import RoleRequest from '../models/User/RoleRequest'
 import UserModel from '../models/User/UserModel'
 import UserModelError, { UserModelErrorBadRequest } from '../models/Errors/UserModelError'
 import PhoneRequest from '../models/User/PhoneRequest'
+import { UUID } from 'crypto'
+
+interface DeleteUserRequestBody {
+  currentUserId: UUID;
+  userId?: UUID; // userId es opcional
+}
+
+interface CreateUserRequestBody {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: string;
+}
+
+interface UpdateRequestBody {
+  currentUserId: UUID;
+  userId?: UUID; // userId es opcional
+  name?: string;
+  email?: string;
+  phone?: string;
+  password?: string;
+  role?: string;
+}
+
+interface LoginRequestBody {
+  email: string;
+  phone: string;
+  password: string;
+}
 
 class UserController {
-  static delete = async (req: express.Request, resp: express.Response) => {
+  static delete = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
-      const { currentUserId, userId } = req.body
+      const { currentUserId, userId } = req.body as DeleteUserRequestBody;
       const result = await UserService.deleteUser(currentUserId, userId)
       return resp.status(200).send(result)
-    } catch (err: any) {
+    } catch (err: unknown) {
       return ErrorHandler.handleError(
         resp,
         err,
@@ -24,13 +54,13 @@ class UserController {
       )
     }
   }
-  static create = async (req: express.Request, resp: express.Response) => {
+  static create = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
-      const { name, email, phone, password, role } = req.body;
+      const { name, email, phone, password, role } = req.body as CreateUserRequestBody;
       let roleObject: string = role;
       const validationError = validateFields({ name, email, phone, password });
 
-      if (validationError) {
+      if (validationError !== null) {
         throw new UserModelErrorBadRequest(validationError);
       }
 
@@ -38,7 +68,7 @@ class UserController {
 
       if (role === undefined) {
         roleObject = 'cliente';
-      } else if (validationRolError) {
+      } else if (validationRolError !== null) {
         throw new UserModelError(validationRolError);
       }
 
@@ -50,13 +80,14 @@ class UserController {
         role: roleObject
       });
       return resp.status(200).send(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log('error', err)
       return ErrorHandler.handleError(resp, err, 'Error al crear usuario');
     }
   };
 
-  static update = async (req: express.Request, resp: express.Response) => {
+
+  static update = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
       const {
         currentUserId,
@@ -66,51 +97,71 @@ class UserController {
         phone,
         password,
         role
-      } = req.body
+      } = req.body as UpdateRequestBody;
 
-      const userId = reqUserId || currentUserId
-      const model = new UserModel()
-      const user = await model.getCurrentUser(currentUserId)
+      // Ensure userId is either a string or undefined
+      const userId = reqUserId ?? currentUserId;
 
-      let isModificableRole = false
-      if (user.role === 'admin') {
-        isModificableRole = true
+      console.log("userId -> DEV PARAM", userId);
+      const model = new UserModel();
+      const user = await model.getCurrentUser(currentUserId);
+
+      if (user === null) {
+        throw new UserModelError('Usuario no encontrado');
       }
+
+      const isModificableRole = user.role === 'admin';
+
       if (!isModificableRole && role !== undefined) {
-        throw new UserModelError('No se puede modificar el rol de un usuario que no es administrador')
+        throw new UserModelError('No se puede modificar el rol de un usuario que no es administrador');
       }
 
       const validatedData: {
-        name?: string
-        email?: string
-        phone?: string
-        password?: string
-        role?: string
-      } = {}
+        name?: string;
+        email?: string;
+        phone?: string;
+        password?: string;
+        role?: string;
+      } = {};
 
-      // Definir las claves permitidas explícitamente en TypeScript
-      type ValidatedDataKeys = 'name' | 'email' | 'phone' | 'password' | 'role'
+      type ValidatedDataKeys = 'name' | 'email' | 'phone' | 'password' | 'role';
 
-      const validateField = (
-        RequestClass: any,
-        value: string,
-        field: ValidatedDataKeys
-      ) => {
-        const request = new RequestClass(value)
-
-        if (!request.isValid) {
-          throw new UserModelError(request.messageError)
-        }
-        validatedData[field] = request[field]
-        return true
+      interface ValidatableRequest {
+        isValid: boolean;
+        messageError?: string;
+        name?: string | null;
+        email?: string | null;
+        phone?: string | null;
+        password?: string;
+        role?: string | null;
       }
 
+      const validateField = <T extends ValidatableRequest>(
+        RequestClass: new (value: string) => T,
+        value: string | null,  // Accept null
+        field: ValidatedDataKeys
+      ): void => {
+        if (value === null) return;  // Skip if null
+
+        const request = new RequestClass(value);
+
+        console.log("request", request);
+
+        if (!request.isValid) {
+          throw new UserModelError(request.messageError ?? 'Error de validación');
+        }
+
+        validatedData[field] = request[field] ?? undefined; // Now this line is safe
+      };
+
       // Validaciones de los campos opcionales
-      if (name) validateField(UserNameRequest, name, 'name')
-      if (email) validateField(EmailRequest, email, 'email')
-      if (phone) validateField(PhoneRequest, phone, 'phone')
-      if (password) validateField(PasswordRequest, password, 'password')
-      if (isModificableRole && role !== undefined) { validateField(RoleRequest, role, 'role') }
+      if (name !== undefined) validateField(UserNameRequest, name, 'name');
+      if (email !== undefined) validateField(EmailRequest, email, 'email');
+      if (phone !== undefined) validateField(PhoneRequest, phone, 'phone');
+      if (password !== undefined) validateField(PasswordRequest, password, 'password');
+      if (isModificableRole && role !== undefined) {
+        validateField(RoleRequest, role, 'role');
+      }
 
       // Actualizar usuario
       const result = await UserService.updateUser(
@@ -120,25 +171,30 @@ class UserController {
         validatedData.phone,
         validatedData.password,
         validatedData.role
-      )
-      return resp
-        .status(200)
-        .send({
-          message: 'Usuario actualizado con éxito',
-          ...validatedData,
-          success: result.affectedRows > 0
-        })
-    } catch (err: any) {
-      return ErrorHandler.handleError(resp, err, 'Error al actualizar usuario', 500)
-    }
-  }
+      );
 
-  static getCurrent = async (req: express.Request, resp: express.Response) => {
+      if (result === null) {
+        throw new UserModelError('Error al actualizar usuario');
+      }
+
+      return resp.status(200).send({
+        message: 'Usuario actualizado con éxito',
+        ...validatedData,
+        success: (result.affectedRows > 0),
+      });
+    } catch (err) {
+      return ErrorHandler.handleError(resp, err, 'Error al actualizar usuario', 500);
+    }
+  };
+
+
+  static getCurrent = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
-      const { currentUserId } = req.body
+      const { currentUserId } = req.body as { currentUserId: UUID };
       const result = await UserService.getCurrentUser(currentUserId)
+      console.log("result", result)
       return resp.status(200).send({ success: true, ...result })
-    } catch (err: any) {
+    } catch (err: unknown) {
       return ErrorHandler.handleError(
         resp,
         err,
@@ -147,21 +203,22 @@ class UserController {
     }
   }
 
-  static getUsers = async (_: express.Request, resp: express.Response) => {
+  static getUsers = async (_: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
       const result = await UserService.getUsers()
       return resp.status(200).send(result)
-    } catch (err: any) {
+    } catch (err: unknown) {
       return ErrorHandler.handleError(resp, err, 'Error al obtener usuarios', 500)
     }
   }
 
-  static login = async (req: express.Request, resp: express.Response) => {
+  static login = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
-      const { email, phone, password } = req.body
+      const { email, phone, password } = req.body as LoginRequestBody;
       const result = await UserService.loginUser(email, phone, password)
+      console.log("result", result)
       return resp.status(200).send(result)
-    } catch (err: any) {
+    } catch (err: unknown) {
       return ErrorHandler.handleError(resp, err, 'Error interno del servidor', 500)
     }
   }
