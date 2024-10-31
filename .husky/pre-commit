@@ -1,1 +1,1 @@
-pnpm build
+pnpm run lint && pnpm run lint-and-fix && pnpm run build
