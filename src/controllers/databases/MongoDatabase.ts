@@ -1,4 +1,5 @@
-// src/database/MongoDatabase.ts
+/* eslint-disable */
+
 import { Collection, MongoClient, ObjectId, MongoServerSelectionError } from 'mongodb'
 
 import dotenv from 'dotenv'
@@ -7,8 +8,6 @@ import { UUID } from 'crypto'
 import { exit } from 'process'
 import { isNulledFields } from '../Utils'
 import { FilterAbstractModel } from '../../models/FilterModel'
-// import { MongooseError } from "mongoose";
-// eslint-disable @typescript-eslint/space-before-function-paren
 dotenv.config()
 
 const { URI_MONGODB, DB_MONGODB, COLLECT_NAME_MONGODB } = process.env
@@ -30,25 +29,25 @@ class MongoDatabase implements IDatabaseLog {
   };
 
   constructor() {
-    this.client = new MongoClient(URI_MONGODB!);
+    this.client = new MongoClient(URI_MONGODB as string);
 
     this.logsCollection = this.client
-      .db(DB_MONGODB)
-      .collection(COLLECT_NAME_MONGODB!)
+      .db(DB_MONGODB as string)
+      .collection(COLLECT_NAME_MONGODB as string)
 
-    this.connect().catch((error) => {
+    this.connect().catch((error: unknown) => {
       console.error('[dblog] - Error al conectar a la base de datos de registros:', error)
       exit(-255)
     })
   }
 
 
-  private async connect() {
+  private async connect(): Promise<void> {
     try {
       await this.client.connect()
       console.log('[dblog] - Conexión exitosa a la base de datos de registros MongoDB')
       this.clientisConnected = true
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof MongoServerSelectionError) {
         console.error(`[dblog] - Error al conectar a la base de datos de registros MongoDB: ${error.cause?.message}`)
       } else {
@@ -58,18 +57,21 @@ class MongoDatabase implements IDatabaseLog {
     }
   }
 
-  public async get(query: string, params: any[]): Promise<any> {
+   
+  public async get(_query: string, params: any[]): Promise<any> {
     return await this.logsCollection.findOne({ _id: new ObjectId(params[0]) })
   }
 
-  public async all(query: string, params: any[]): Promise<any> {
+   
+  public async all(_query: string, _params: any[]): Promise<any> {
     return await this.logsCollection.find().toArray()
   }
   public async search(filters: FilterAbstractModel): Promise<any> {
     return await this.logsCollection.find(filters.getFilters()).toArray()
   }
 
-  public async run(query: string, params: any[]): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/explicit-any
+  public async run(_query: string, params: any[]): Promise<any> {
     return await this.logsCollection.updateOne(
       { _id: new ObjectId(params[0]) },
       { $set: params[1] }

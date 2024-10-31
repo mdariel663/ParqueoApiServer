@@ -1,3 +1,4 @@
+// eslint-disable @/no-unused-vars
 import { Request, Response, NextFunction } from 'express'
 import IMiddleware from '../../models/IMiddleware'
 import ITokenModel from '../../models/ITokenModel'
@@ -11,11 +12,15 @@ export default class BaseMiddleware implements IMiddleware {
     console.log('Middleware Iniciatialized ...')
   }
 
-  authorizeAdmin(req: Request, res: Response, next: NextFunction): void {
+
+
+
+
+  authorizeAdmin(_req: Request, _res: Response, _next: NextFunction): void {
     throw new Error('Method not implemented.')
   }
 
-  onlyAuthenticated(req: Request, res: Response, next: NextFunction): void {
+  onlyAuthenticated = (_req: Request, _res: Response, _next: NextFunction): void => {
     throw new Error('Method not implemented.')
   }
 }

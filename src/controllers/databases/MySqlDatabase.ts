@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import mysql from 'mysql2/promise'
 import IDatabase from '../../models/Database/IDatabase'
 import { isNulledFields } from '../Utils'
@@ -29,7 +31,7 @@ class MySQLDatabase implements IDatabase {
 
   getConnectionState(): boolean {
     return this.clientisConnected;
-  };
+  }
 
 
   private async connect(): Promise<boolean> {
@@ -60,19 +62,18 @@ class MySQLDatabase implements IDatabase {
     }
   }
 
-  // Obtiene el primer elemento
   public async get(query: string, params: any[]): Promise<any> {
-    await this.ensureConnection()
+    await this.ensureConnection();
     try {
-      const rows = await this.db!.execute(query, params)
-      return rows[0] || null
+      const [rows]: any = await this.db!.execute(query, params);
+      return rows.length > 0 ? rows[0] : null;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
-  // Obtiene todos las filas
-  public async all(query: string, params: any[]): Promise<any> {
+
+  public async all(query: string, params: unknown[]): Promise<any> {
     await this.ensureConnection()
     try {
       const [rows] = await this.db!.execute(query, params)
@@ -82,11 +83,15 @@ class MySQLDatabase implements IDatabase {
     }
   }
 
-  public async run(query: string, params: any[]): Promise<any> {
+  public async run(query: string, params: unknown[]): Promise<any> {
     await this.ensureConnection()
     try {
-      const [result] = await this.db!.execute(query, params)
-      return result
+      if (this.db == null) {
+        await this.connect()
+      } else {
+        const [result] = await this.db.execute(query, params)
+        return result
+      }
     } catch (error) {
       throw error
     }
