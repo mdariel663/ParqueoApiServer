@@ -1,10 +1,7 @@
 /* eslint-disable */
-
 import { Collection, MongoClient, ObjectId, MongoServerSelectionError } from 'mongodb'
-
 import dotenv from 'dotenv'
-import { IDatabaseLog } from '../../models/Database/IDatabaseLog'
-import { UUID } from 'crypto'
+import { IDatabaseLog, LogEntry } from '../../models/Database/IDatabaseLog'
 import { exit } from 'process'
 import { isNulledFields } from '../Utils'
 import { FilterAbstractModel } from '../../models/FilterModel'
@@ -57,12 +54,12 @@ class MongoDatabase implements IDatabaseLog {
     }
   }
 
-   
+
   public async get(_query: string, params: any[]): Promise<any> {
     return await this.logsCollection.findOne({ _id: new ObjectId(params[0]) })
   }
 
-   
+
   public async all(_query: string, _params: any[]): Promise<any> {
     return await this.logsCollection.find().toArray()
   }
@@ -83,18 +80,18 @@ class MongoDatabase implements IDatabaseLog {
     return await this.logsCollection.find(query).sort({ timestamp: -1 }).toArray()
   }
 
-  public async writeLog(log: {
-    user_id: UUID | null
-    action: string
-    description?: string
-  }): Promise<any> {
-    const newLog = {
-      user_id: log.user_id ? log.user_id.toString() : null,
-      action: log.action,
-      description: log.description,
-      timestamp: new Date()
-    }
-    return await this.logsCollection.insertOne(newLog)
+  public async writeLog(log: LogEntry): Promise<any> {
+
+
+    return await this.logsCollection.insertOne({
+      timestamp: log.timestamp.toString() ?? new Date().toString(),
+      level: log.level?.toString() ?? 'info',
+      message: log.message,
+      userId: log.userId?.toString() ?? null,
+      action: log.action?.toString() ?? null,
+      resource: log.resource?.toString() ?? null,
+      details: log.details ?? {}
+    })
   }
 }
 
