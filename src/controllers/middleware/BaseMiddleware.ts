@@ -13,7 +13,9 @@ export default class BaseMiddleware implements IMiddleware {
   }
 
 
-
+  authorizeStaff(_req: Request, _res: Response, _next: NextFunction): void {
+    throw new Error('Method not implemented.')
+  }
 
 
   authorizeAdmin(_req: Request, _res: Response, _next: NextFunction): void {
