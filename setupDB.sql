@@ -248,8 +248,7 @@ END $$
 
 
 CREATE PROCEDURE IF NOT EXISTS apiParqueo.DeleteReservation(
-    IN reservation_id VARCHAR(64),
-    IN user_id VARCHAR(64)
+    IN reservation_id VARCHAR(64)
 )
 BEGIN
     DECLARE parking_space_id VARCHAR(64);
@@ -260,7 +259,7 @@ BEGIN
     WHERE id = reservation_id;
 
     DELETE FROM reservations
-    WHERE id = reservation_id AND user_id = user_id;
+    WHERE id = reservation_id;
 
     IF NOT EXISTS (
         SELECT 1 FROM reservations
