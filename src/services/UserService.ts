@@ -10,6 +10,7 @@ import UserFilterModel from "../models/UserFilterModel";
 import User from "../models/User/UserInterface";
 import UserResponse, { UserLoginResponse } from "../models/User/UserResponse";
 import UserLogged from "../models/User/UserInterface";
+import LoggerController, { defaultEntryLog } from "../controllers/LoggerController";
 
 class UserService {
   static async deleteUser(currentUserId: UUID, userDeleteId: UUID | undefined): Promise<{ success: boolean; message: string; userId: UUID }> {
@@ -22,20 +23,40 @@ class UserService {
     }
 
     if (userDeleteId === undefined) {
-      console.log("aaaaaaaaaaaaaaaaaaaaa")
       userDeleteId = currentUserId;
     } else if (currentUser.role !== "admin") {
       throw new UserModelError("No se puede eliminar un usuario si usted no es administrador.");
     }
-    console.log("cccccccccccccccccccccccc")
 
     const userData = await userModel.getUserById(userDeleteId);
 
     if (userData === null) {
+      LoggerController.sendLog({
+        ...defaultEntryLog,
+        message: "Se intento eliminar un usuario que no existe",
+        action: "Eliminar Usuario",
+        resource: "user",
+        details: {
+          userId: userDeleteId,
+          action: "Eliminar Usuario",
+          description: "Se intento eliminar un usuario que no existe"
+        }
+      })
       throw new UserModelError("El usuario no existe");
     }
 
     await userModel.deleteUser(userDeleteId);
+    LoggerController.sendLog({
+      ...defaultEntryLog,
+      message: "Usuario eliminado",
+      action: "Eliminar Usuario",
+      resource: "user",
+      details: {
+        userId: userDeleteId,
+        action: "Eliminar Usuario",
+        description: "Se intento eliminar un usuario"
+      }
+    })
     return {
       success: true,
       message: "Usuario eliminado",
@@ -87,6 +108,32 @@ class UserService {
     }
     // Crear el usuario en la base de datos
     const user = await userModel.create(requestData);
+
+    LoggerController.sendLog({
+      ...defaultEntryLog,
+      message: "Usuario creado",
+      action: "Crear Usuario",
+      resource: "user",
+      details: {
+        userId: user.id,
+        action: "Crear Usuario",
+        description: "Se intento crear un usuario"
+      }
+    })
+    if (role === "admin") {
+      LoggerController.sendLog({
+        ...defaultEntryLog,
+        level: "warn",
+        message: "Usuario creado como admin",
+        action: "Crear Usuario",
+        resource: "user",
+        details: {
+          userId: user.id,
+          action: "Crear Usuario",
+          description: "Se intento crear un usuario como admin"
+        }
+      })
+    }
     return { success: true, user: user };
   }
 
@@ -108,13 +155,41 @@ class UserService {
     role?: string
   ): Promise<{ affectedRows: number } | null> {
     const userModel: UserModel = new UserModel();
-    return await userModel.updateUser(userId, {
+    const awaitUser = await userModel.updateUser(userId, {
       name,
       email,
       phone,
       password,
       role,
     });
+
+    if (awaitUser && awaitUser?.affectedRows > 0) {
+      LoggerController.sendLog({
+        ...defaultEntryLog,
+        message: "Usuario actualizado",
+        action: "Actualizar Usuario",
+        resource: "user",
+        details: {
+          userId: userId,
+          action: "Actualizar Usuario",
+          description: "Se intento actualizar un usuario"
+        }
+      })
+    } else {
+      LoggerController.sendLog({
+        ...defaultEntryLog,
+        level: "error",
+        message: "Error al actualizar usuario",
+        action: "Actualizar Usuario",
+        resource: "user",
+        details: {
+          userId: userId,
+          action: "Actualizar Usuario",
+          description: "Se intento actualizar un usuario"
+        }
+      })
+    }
+    return awaitUser;
   }
 
   static getCurrentUser = async (userId: UUID): Promise<UserLogged> => {
@@ -139,10 +214,14 @@ class UserService {
       );
     }
 
+
     const emailRequest: EmailRequest | null = (email !== undefined) ? new EmailRequest(email) : null;
     const phoneRequest: PhoneRequest | null = (phone !== undefined) ? new PhoneRequest(phone) : null;
     const passwordRequest: PasswordRequest = new PasswordRequest(password);
 
+    if (emailRequest?.isValid === true && phoneRequest?.isValid === true) {
+      throw new UserModelError("No puedes usar ambos email y phone, solo uno");
+    }
     if (emailRequest && !emailRequest.isValid) {
       throw new UserModelError("El formato de email no es válido");
     }
@@ -166,8 +245,35 @@ class UserService {
             );
           }
           return user;
+
         }).catch((_e: unknown) => {
           console.log("error", _e)
+          if (emailRequest) {
+            LoggerController.sendLog({
+              ...defaultEntryLog,
+              message: "Error al intentar autenticar usuario",
+              action: "Login",
+              resource: "user",
+              details: {
+                userId: emailRequest.email,
+                action: "Login",
+                description: "Error al intentar autenticar usuario"
+              }
+            })
+          } else if (phoneRequest) {
+            LoggerController.sendLog({
+              ...defaultEntryLog,
+              message: "Error al intentar autenticar usuario",
+              action: "Login",
+              resource: "user",
+              level: "error",
+              details: {
+                userId: phoneRequest.phone,
+                action: "Login",
+                description: "Error al intentar autenticar usuario"
+              }
+            })
+          }
           throw new UserModelError(
             "El usuario no existe o la contraseña es incorrecta"
           );

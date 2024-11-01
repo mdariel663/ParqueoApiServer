@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export default interface UserResponse {
-    "id": string,
+    "id": UUID;
     "token": string
 }
 export interface UserLoginResponse extends UserResponse {

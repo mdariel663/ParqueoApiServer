@@ -32,9 +32,7 @@ class UserModel {
       'SELECT name, email, phone, role, created_at, updated_at FROM users WHERE id = ?',
       [userId]
     )
-    console.log("Test getCurrentUser")
-    console.log("userId", userId)
-    console.log("user", user)
+
     if (user === undefined) {
       throw new UserModelError('Usuario sin permisos o innexistente')
     }
@@ -66,8 +64,9 @@ class UserModel {
     const query = `SELECT id, password FROM users WHERE ${paramType} = ?`
     const result = await this.db.get<{ id: UUID, password: string }>(query, [value])
 
-    if (result === null) return null
-
+    if (result === null) {
+      return null
+    }
     const isPasswordValid = await passwordRequest.verifyPassword(result.password)
 
     if (isPasswordValid) {
@@ -191,3 +190,4 @@ class UserModel {
 }
 
 export default UserModel
+

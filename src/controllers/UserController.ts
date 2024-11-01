@@ -10,6 +10,8 @@ import UserModel from '../models/User/UserModel'
 import UserModelError, { UserModelErrorBadRequest } from '../models/Errors/UserModelError'
 import PhoneRequest from '../models/User/PhoneRequest'
 import { UUID } from 'crypto'
+import { UserLoginResponse } from '../models/User/UserResponse'
+import LoggerController from './LoggerController'
 
 interface DeleteUserRequestBody {
   currentUserId: UUID;
@@ -213,12 +215,15 @@ class UserController {
   }
 
   static login = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
+    const { email, phone, password } = req.body as LoginRequestBody;
+
     try {
-      const { email, phone, password } = req.body as LoginRequestBody;
-      const result = await UserService.loginUser(email, phone, password)
+      const result: UserLoginResponse = await UserService.loginUser(email, phone, password)
+      LoggerController.sendLogin(result.id, true)
       console.log("result", result)
       return resp.status(200).send(result)
     } catch (err: unknown) {
+      LoggerController.sendLogin(email ?? phone, false)
       return ErrorHandler.handleError(resp, err, 'Error interno del servidor', 500)
     }
   }

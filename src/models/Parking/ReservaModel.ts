@@ -3,7 +3,7 @@ import VehiculoModel from './VehiculesModel'
 import FechaModel from './FechaModel'
 import ReservaModelResponse from '../Reservas/ReservaModelResponse'
 class ReservaModel {
-  static async getReservaById(db: IDatabase, reservationId: string) {
+  static async getReservaById(db: IDatabase, reservationId: string): Promise<ReservaModelResponse> {
     return await db.get<ReservaModelResponse>('SELECT id, user_id, parking_space_id, vehicle_id, start_time, end_time, created_at, updated_at FROM reservations WHERE id = ?;', [reservationId])
   }
   constructor(

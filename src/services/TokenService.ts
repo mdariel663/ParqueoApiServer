@@ -20,17 +20,19 @@ class TokenService implements ITokenModel {
 
   async getIdFromHeader(req: Request): Promise<UUID> {
     const tokenRequest = req.header('authorization')?.replace('Bearer ', '')
-    return await new Promise<UUID>((resolve) => {
-      this.verifyToken(tokenRequest)
-        .then((tokenData) => resolve(tokenData?.id))
-        .catch((err: unknown) => {
-          const error = err as { "message": string }
-          if (error instanceof TokenModelError) {
-            throw new TokenModelError(error.message)
-          }
-          throw new TokenModelError("Error desconocido con respecto al token")
-        })
-    })
+    return await new Promise<UUID>((resolve, reject) => this.verifyToken(tokenRequest)
+      .then((tokenData) => resolve(tokenData?.id))
+      .catch((err: unknown) => {
+        const error = err as { "message": string }
+        if (error instanceof TokenModelError) {
+          //  console.log("error xd", error)
+          //            throw new TokenModelError(error.message)
+          reject(error.message)
+        }
+        reject("Error desconocido con respecto al token")
+        //throw new TokenModelError("Error desconocido con respecto al token")
+      })
+    )
   }
 
   generateToken(id: UUID): string {

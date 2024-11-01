@@ -59,6 +59,7 @@ const middleware: IMiddleware = new Middleware(tokenService, databaseRepository)
 
 export const onlyAuthenticatedAccess = middleware.onlyAuthenticated;
 export const onlyAdminAccess = middleware.authorizeAdmin;
+export const onlyStaffAccess = middleware.authorizeStaff;
 console.log("[server] - Iniciando Servidor Completamente....");
 
 export default { middleware, persistentLog, tokenService, databaseRepository };
