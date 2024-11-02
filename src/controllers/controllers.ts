@@ -14,9 +14,10 @@ dotenv.config();
 // Crear instancias
 export const databaseRepository: IDatabase = new MySqlDatabase();
 export const databaseRepositoryMongo: IDatabaseLog = new MongoDatabase();
-
-//console.log("[db] - Esperando conexión con base de datos...");
-//console.log("[db] - Esperando conexión con base de datos de registros...");
+if (process.env.NODE_ENV === 'production') {
+    console.log("[db] - Esperando conexión con base de datos...");
+    console.log("[db] - Esperando conexión con base de datos de registros...");
+}
 
 const waiterMs = 3000; // en ms
 const counterMax = 10;
