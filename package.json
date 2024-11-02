@@ -8,7 +8,11 @@
     "start": "node dist/apiRest.js",
     "lint": "eslint ",
     "lint-and-fix": "eslint --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -22,6 +26,7 @@
     "typescript-eslint": "^8.12.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
     "@types/bcrypt": "^5.0.2",
@@ -32,6 +37,7 @@
     "@types/node": "^22.8.4",
     "@typescript-eslint/eslint-plugin": "^8.12.2",
     "@typescript-eslint/parser": "^8.12.2",
+    "babel-jest": "^29.7.0",
     "cors": "^2.8.5",
     "eslint": "^9.13.0",
     "eslint-config-prettier": "^9.1.0",
