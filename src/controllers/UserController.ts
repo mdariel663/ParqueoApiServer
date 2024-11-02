@@ -7,11 +7,11 @@ import PasswordRequest from '../models/User/PasswordRequest'
 import UserNameRequest from '../models/User/UserNameRequest'
 import RoleRequest from '../models/User/RoleRequest'
 import UserModel from '../models/User/UserModel'
-import UserModelError, { UserModelErrorBadRequest } from '../models/Errors/UserModelError'
 import PhoneRequest from '../models/User/PhoneRequest'
 import { UUID } from 'crypto'
 import { UserLoginResponse } from '../models/User/UserResponse'
 import LoggerController from './LoggerController'
+import UserModelError, { UserModelErrorBadRequest } from '../models/Errors/UserModelError'
 
 interface DeleteUserRequestBody {
   currentUserId: UUID;

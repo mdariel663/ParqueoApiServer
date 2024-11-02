@@ -68,27 +68,6 @@ export default class ParkingModel {
         }
     }
 
-    /*static async updateSpaceAvailability(
-        connection: IDatabase,
-        parking_current_space_id: string,
-        spaceDetails: { parking_space_id?: string d, is_available: boolean | undefined }
-    ): Promise<boolean> {
-        const { parking_space_id, is_available } = spaceDetails;
-
-        const result = await connection.run("UPDATE parking_spaces SET is_available = ?, updated_at = NOW() WHERE id = ?;", [is_available, id])
-        return result.affectedRows > 0 // Retornar true si la actualización fue exitosa
-    }*/
-
-    static async updateNewSpaceCheck(connection: IDatabase, new_parking_space_id: string) {
-        let checkNewSpace: { count: number };
-
-        let data = await connection.runPlusPlus<{ count: number }[]>(
-            "SELECT COUNT(*) AS count FROM parking_spaces WHERE id = ?;",
-            [new_parking_space_id]
-        )
-        checkNewSpace = data[0];
-        return checkNewSpace;
-    }
     static async updateSpaceAvailability(
         connection: IDatabase,
         parking_current_space_id: string,
@@ -103,7 +82,7 @@ export default class ParkingModel {
                     is_available ?? true
                 ]);
             return result.affectedRows > 0;
-        } catch (error) {
+        } catch (error: unknown) {
             throw error;
         }
     }

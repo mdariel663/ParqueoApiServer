@@ -7,12 +7,12 @@ import PasswordRequest from './PasswordRequest'
 import RoleRequest from './RoleRequest'
 import UserNameRequest from './UserNameRequest'
 import controllers from '../../controllers/controllers'
-import UserModelError from '../Errors/UserModelError'
 import PhoneRequest from './PhoneRequest'
 import FilterModel from '../FilterModel'
 import User from './UserInterface'
 import UserResponse from './UserResponse'
 import UserLogged from './UserInterface'
+import UserModelError from '../Errors/UserModelError'
 export class UserFilterModel extends FilterModel { }
 
 class UserModel {

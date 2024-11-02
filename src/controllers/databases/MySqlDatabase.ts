@@ -83,6 +83,20 @@ class MySQLDatabase implements IDatabase {
     }
   }
 
+  public async runPlusPlus(query: string, params: unknown[]): Promise<any> {
+    await this.ensureConnection()
+    try {
+      if (this.db == null) {
+        await this.connect()
+      } else {
+        const [result] = await this.db.execute(query, params)
+        return result
+      }
+    } catch (error) {
+      throw error
+    }
+    return null
+  }
   public async run(query: string, params: unknown[]): Promise<any> {
     await this.ensureConnection()
     try {

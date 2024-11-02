@@ -3,9 +3,9 @@ import { Request, Response, NextFunction } from 'express'
 import BaseMiddleware from './BaseMiddleware'
 import UserModel from '../../models/User/UserModel'
 import ErrorHandler from '../HandleErrors'
-import UserModelError, { UserModelErrorAuth } from '../../models/Errors/UserModelError'
 import { UUID } from 'crypto'
 import UserLogged from '../../models/User/UserInterface'
+import UserModelError, { UserModelErrorAuth } from '../../models/Errors/UserModelError'
 
 
 class Middleware extends BaseMiddleware {
@@ -63,8 +63,6 @@ class Middleware extends BaseMiddleware {
       const currentUserId = await this.tokenService.getIdFromHeader(req).then((id) => id).catch(() => {
         throw new UserModelErrorAuth('Usuario no autenticado')
       })
-
-      console.log("currentUserId", currentUserId)
 
       const user: UserModel = new UserModel()
       const userData: UserLogged | null = await user.getCurrentUser(currentUserId)

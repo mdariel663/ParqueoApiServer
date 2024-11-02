@@ -7,7 +7,7 @@ export default class ReservaModelResponse {
 
 
     constructor(private readonly db: IDatabase | null,
-        private readonly id: UUID,
+        readonly id: UUID,
         private readonly user_id: UUID,
         readonly parking_space_id: string,
         private readonly vehicle_id: string) {
@@ -17,11 +17,6 @@ export default class ReservaModelResponse {
             console.log('Error al obtener el vehiculo:', error)
         })
     }
-
-    // Asynchronous method to initialize vehicle response
-    // async initialize() {
-    //    await
-    //  }
 
     private readonly getVehicle = async (): Promise<void> => {
         if (this.db != null) {

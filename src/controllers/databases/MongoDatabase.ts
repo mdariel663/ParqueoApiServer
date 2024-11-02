@@ -75,6 +75,11 @@ class MongoDatabase implements IDatabaseLog {
     )
   }
 
+  // is for satisfins the interface
+  public async runPlusPlus(query: string, params: unknown[]): Promise<any> {
+    throw new Error('Method not implemented.')
+  }
+
   public async getLogs(action?: string): Promise<any> {
     const query = action ? { action } : {} // Si action está presente, filtra por ese valor
     return await this.logsCollection.find(query).sort({ timestamp: -1 }).toArray()

@@ -8,6 +8,23 @@ export interface VehiculoPrimitives {
   model: string
   plate: string
 }
+/* export class VehicleModel {
+  constructor(
+    private readonly id: string,
+    private readonly make: string,
+    private readonly model: string,
+    private readonly plate: string
+  ) { }
+
+  toJSON(): {} {
+    return {
+      id: this.id,
+      make: this.make,
+      model: this.model,
+      plate: this.plate
+    }
+  }
+} */
 
 class VehiculoModel {
   make!: string // marca
