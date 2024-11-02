@@ -235,7 +235,6 @@ Authorization: Bearer <token>
 - **phone** (opcional): Numero de telefono del usuario.
 - **password** (opcional): Contraseña del usuario.
 - **role** (opcional, solo puede ser actualizado por el usuario administrador): Rol del usuario.
-  // TODO: verificar si un email es valido pero el phone no lo es
 
 ##### Solicitud
 
