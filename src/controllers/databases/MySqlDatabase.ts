@@ -32,6 +32,9 @@ class MySQLDatabase implements IDatabase {
     })
   }
 
+  async closeConnection(): Promise<void> {
+    return await this.db?.end()
+  }
 
   getConnectionState(): boolean {
     return this.clientisConnected;

@@ -6,8 +6,8 @@ interface IDatabase {
   all<T = unknown>(query: string, params: unknown[]): Promise<T[]>;
   run(query: string, params: unknown[]): Promise<{ affectedRows: number }>;
   runPlusPlus<T = unknown>(query: string, params: unknown[]): Promise<T>;
-
   getConnectionState(): boolean;
+  closeConnection(): Promise<void>;
 }
 
 export default IDatabase;

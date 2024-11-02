@@ -34,10 +34,13 @@ class MongoDatabase implements IDatabaseLog {
 
     this.connect().catch((error: unknown) => {
       console.error('[dblog] - Error al conectar a la base de datos de registros:', error)
-      exit(-255)
+      exit(1)
     })
   }
 
+  async closeConnection(): Promise<void> {
+    return await this.client?.close()
+  }
 
   private async connect(): Promise<void> {
     try {
