@@ -1,4 +1,4 @@
-# POST http://localhost:8000/api/v2/parking/reservas
+# POST http://localhost:8000/api/v2/reservas
 
 ##### Descripción:
 
@@ -124,7 +124,7 @@ Código: **401 Unauthorized** \| Ejemplo de Respuesta: \| Código:
 
 ---
 
-# GET http://localhost:8000/api/v2/parking/reservas
+# GET http://localhost:8000/api/v2/reservas
 
 ### Description: Obtener Reservas
 
@@ -190,7 +190,7 @@ Código: **500 Internal Server Error** \| Ejemplo de Respuesta:
 
 ---
 
-# DELETE http://localhost:8000/api/v2/parking/reservas
+# DELETE http://localhost:8000/api/v2/reservas/xyz
 
 ### Description:
 
@@ -203,14 +203,6 @@ Requiere que el usuario esté autenticado mediante el token en el header de tipo
 #### Headers:
 
 Authorization: Bearer {token}
-
-#### Solicitud
-
-```json
-{
-  "reservationId": "string" // UID de la reserva
-}
-```
 
 #### Respuestas Posibles
 
