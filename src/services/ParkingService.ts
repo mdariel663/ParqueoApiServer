@@ -1,31 +1,16 @@
 import IDatabase from '../models/Database/IDatabase'
-import SpaceParkingModel from '../models/Parking/SpaceParkingModel'
 import ReservaService from './ReservaService'
 import VehiculoModel from '../models/Parking/VehiculesModel'
 import FechaModel from '../models/Parking/FechaModel'
-import ParkingError from '../models/Errors/ParkingModelError'
 import { validateFields } from '../controllers/Utils'
-import OcupancyParkingSpace from '../models/OcupancyParkingSpace'
-import ParkingSpace from '../models/OcupancyParkingSpace'
-class ReservaError extends ParkingError { }
-interface ReservaParkingSpace {
-  success: boolean
-  message: string
-  detalles: {
-    id: string
-    user_id: string
-    parking_space_id: string
-    vehiculo: string | {
-      make: string
-      model: string
-      plate: string
-    }
-    start_time: FechaModel
-    end_time: FechaModel
-    created_at: Date
-    updated_at: Date
-  }
-}
+import ParkingError from '../models/Errors/ParkingModelError'
+import ReservaModelError from '../models/Errors/ReservaModelError'
+import ReservaModelResponse from '../models/Reservas/ReservaModelResponse'
+import ReservaParkingSpaceCreate from '../models/Reservas/ReservaParkingSpaceCreate'
+import { ParkingSpaceRequestUpdate, ParkingSpaceRow } from '../models/Parking/ParkingSpace'
+import ParkingModel from '../models/ParkingModel'
+import ParkingModelError from '../models/Errors/ParkingModelError'
+ReservaModelResponse
 class ParkingService {
   private readonly reservaService: ReservaService
 
@@ -37,63 +22,27 @@ class ParkingService {
     this.reservaService = new ReservaService(db)
   }
 
-  async getParkingSpaceById(parkingSpaceId: String): Promise<Array<SpaceParkingModel>> {
+
+  async getAllSpaces(): Promise<Array<ParkingSpaceRow>> {
+
+    const [rows] = await this.db.all<Array<ParkingSpaceRow>>('CALL GetParkingSpaces();', [])
+
+    if (rows !== null && rows.length === 0) {
+      return []
+    }
+    return rows
+  }
+
+
+  async getParkingSpaceById(parkingSpaceId: String): Promise<Array<ParkingSpaceRow>> {
     try {
-      const result = await this.db.get<Array<SpaceParkingModel>>('CALL GetParkingSpaceById(?);', [parkingSpaceId])
+      const result = await this.db.get<Array<ParkingSpaceRow>>('CALL GetParkingSpaceById(?);', [parkingSpaceId])
       console.log("Test PARKINGSPACEBYID")
       console.log("result", result)
       return result
     } catch (error) {
       console.error(error)
       throw new ParkingError('Error al obtener el espacio de aparcamiento')
-    }
-  }
-  async getParkingOccupancy(): Promise<{ occupiedPlazas: OcupancyParkingSpace[] }> {
-    try {
-      // Consulta a la base de datos para obtener las plazas ocupadas y disponibles
-      const plazas = await this.db.get<Array<OcupancyParkingSpace>>('CALL GetParkingOccupancy()', [])
-      console.log("Test GetParkingOccupancy")
-      console.log("plazas", plazas)
-      console.log("      // Consulta a la base de datos para obtener las plazas ocupadas  disponibles")
-      if (plazas !== null && plazas.length === 0) {
-        return { occupiedPlazas: [] }
-      }
-      const result = {
-        occupiedPlazas: Array<OcupancyParkingSpace>()
-      }
-
-      plazas.forEach(
-        (currentPlaza: ParkingSpace) => {
-
-          /*,
-          parking_space_id,
-          is_available: Boolean(is_available), // Convertir 0 o 1 a boolean
-          vehicleDetails: is_available === 0
-            ? {
-              vehicle_id,
-              make,
-              model
-            }
-            : null, // Agrupar en vehicleDetails solo si el espacio no está disponible
-          reservations_count
-          */
-          // Solo añadir si el espacio no está disponible
-
-          // if (!spaceJSON.is_available) {
-          //   result.occupiedPlazas.push(spaceJSON)
-          //}
-
-          if (!currentPlaza.is_available) {
-            result.occupiedPlazas.push(currentPlaza)
-          }
-        }
-      )
-
-      console.log(result)
-      return result
-    } catch (error) {
-      console.log(error)
-      throw new ParkingError('Error al consultar la ocupación del parking')
     }
   }
   async eliminarReserva(reservationId: string): Promise<{ success: boolean, message: string }> {
@@ -107,10 +56,10 @@ class ParkingService {
     startTime: FechaModel,
     endTime: FechaModel,
     parkingSpaceId?: string
-  ): Promise<ReservaParkingSpace> => {
+  ): Promise<ReservaParkingSpaceCreate> => {
     try {
       if (parkingSpaceId !== null && parkingSpaceId !== undefined) {
-        const parkingSpace = await SpaceParkingModel.getSpaceById(
+        const parkingSpace = await ParkingModel.getSpaceById(
           this.db,
           parkingSpaceId as string
         )
@@ -159,30 +108,42 @@ class ParkingService {
       const err = error as { sqlMessage: string, code: string };
       console.log("eee", err)
       if (err.sqlMessage && err.code === 'ER_SIGNAL_EXCEPTION') {
-        throw new ReservaError(err.sqlMessage)
+        throw new ReservaModelError(err.sqlMessage)
       } else {
-        throw new ReservaError('Error al procesar la reserva')
+        throw new ReservaModelError('Error al procesar la reserva')
       }
     }
   }
 
-  async checkAvailableSpace(startTime: FechaModel, endTime: FechaModel): Promise<SpaceParkingModel | null> {
+  async checkAvailableSpace(startTime: FechaModel, endTime: FechaModel): Promise<ParkingSpaceRow | null> {
     const primitiveStartTime = startTime.toPrimitives()
     const primitiveEndTime = endTime.toPrimitives()
-    const [rows] = await this.db.all<Array<SpaceParkingModel>>('CALL CheckAvailableSpaces(?, ?);', [primitiveStartTime, primitiveEndTime])
+    const [rows] = await this.db.all<ParkingSpaceRow[]>('CALL CheckAvailableSpaces(?, ?);', [primitiveStartTime, primitiveEndTime])
+    console.log("available:::::: ", rows)
     return rows[0]
   }
 
-  async updateparkingSpace(spaceId: string, spaceDetails: SpaceParkingModel): Promise<boolean> {
-    return await SpaceParkingModel.updateSpaceAvailability(
+  async updateparkingSpace(spaceId: string, spaceDetails: ParkingSpaceRequestUpdate): Promise<boolean> {
+    const currentSpace = await ParkingModel.getSpaceById(this.db, spaceId)
+    if (currentSpace === null) {
+      throw new ParkingError('No se puede actualizar el espacio de aparcamiento')
+    }
+
+    return await ParkingModel.updateSpaceAvailability(
       this.db,
       spaceId,
-      spaceDetails.getIsAvailable()
-    )
+      spaceDetails
+    ).catch((error: unknown) => {
+      if (error instanceof ParkingModelError) {
+        console.log("error", error)
+        throw new ParkingError((error as { message: string }).message)
+      }
+      throw new ParkingError('Error al actualizar el espacio de aparcamiento')
+    })
   }
 
   async deleteparkingSpace(spaceId: string): Promise<boolean> {
-    return await SpaceParkingModel.deleteSpace(this.db, spaceId)
+    return await ParkingModel.deleteSpace(this.db, spaceId)
   }
 
 }
