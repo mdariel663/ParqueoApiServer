@@ -134,7 +134,7 @@ BEGIN
 END $$
 
 
-CREATE PROCEDURE apiParqueo.GetParkingSpaceById(IN parking_space_id INT)
+CREATE PROCEDURE apiParqueo.GetParkingSpaceById(IN parking_space_id VARCHAR(64))
 BEGIN
     SELECT  
         ps.id AS parking_space_id,
@@ -154,6 +154,7 @@ BEGIN
     GROUP BY 
         ps.id, ps.is_available, v.plate;
 END $$
+
 
 
 CREATE PROCEDURE IF NOT EXISTS apiParqueo.AddReservation(
@@ -177,16 +178,22 @@ BEGIN
     SET vehicle_model = JSON_UNQUOTE(JSON_EXTRACT(vehicle_json, '$.model'));
     SET vehicle_plate = JSON_UNQUOTE(JSON_EXTRACT(vehicle_json, '$.plate'));
 
+    
+    
     -- Verifica si el vehículo ya existe
     SELECT plate INTO existing_vehicle_id
     FROM vehicles
     WHERE plate = vehicle_plate;
 
-    -- Si no existe, se inserta el nuevo vehículo
-    IF existing_vehicle_id IS NULL THEN
-        INSERT INTO vehicles (make, model, plate, created_at, updated_at)
-        VALUES (vehicle_make, vehicle_model, vehicle_plate, NOW(), NOW());
+    -- Si ya existe, genera un error
+    IF existing_vehicle_id IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La matrícula ya está registrada.';
     END IF;
+
+    -- Si no existe, se inserta el nuevo vehículo
+    INSERT INTO vehicles (make, model, plate, created_at, updated_at)
+    VALUES (vehicle_make, vehicle_model, vehicle_plate, NOW(), NOW());
+
 
     -- Verifica que la hora de inicio no esté en el pasado
     IF start_time < NOW() THEN
@@ -227,26 +234,6 @@ BEGIN
     END IF;
 END $$
 
-CREATE PROCEDURE IF NOT EXISTS apiParqueo.GetParkingOccupancy()
-BEGIN
-    SELECT 
-        ps.id AS parking_space_id,
-        ps.is_available,
-        v.plate AS vehicle_id,
-        v.make,
-        v.model,
-        COUNT(r.id) AS reservations_count
-    FROM 
-        parking_spaces ps
-    LEFT JOIN 
-        vehicles v ON ps.vehicle_id = v.plate
-    LEFT JOIN 
-        reservations r ON ps.id = r.parking_space_id
-    GROUP BY 
-        ps.id, ps.is_available, v.plate;
-END $$
-
-
 CREATE PROCEDURE IF NOT EXISTS apiParqueo.DeleteReservation(
     IN reservation_id VARCHAR(64)
 )
@@ -272,5 +259,171 @@ BEGIN
     END IF;
 
 END $$
+
+-- Crear la tabla de movimientos de vehículos
+CREATE TABLE IF NOT EXISTS vehicle_movements (
+    id VARCHAR(64) PRIMARY KEY NOT NULL,
+    vehicle_id VARCHAR(20) NOT NULL,
+    parking_space_id VARCHAR(64) NOT NULL,
+    action ENUM('entrada', 'salida') NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(plate) ON DELETE CASCADE,
+    FOREIGN KEY (parking_space_id) REFERENCES parking_spaces(id) ON DELETE CASCADE
+);
+
+-- Crear procedimiento para registrar la entrada de un vehículo
+CREATE PROCEDURE IF NOT EXISTS apiParqueo.RegisterVehicleEntry(
+    IN movement_id VARCHAR(64),
+    IN vehicle_plate VARCHAR(20),
+    IN parking_space_id VARCHAR(64)
+)
+BEGIN
+    DECLARE vehicle_exists BOOLEAN;
+
+    -- Verificar si el vehículo existe
+    SELECT COUNT(*) > 0 INTO vehicle_exists
+    FROM vehicles
+    WHERE plate = vehicle_plate;
+
+    -- Si el vehículo no existe, se genera un error
+    IF NOT vehicle_exists THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo no existe.';
+    END IF;
+
+    -- Insertar el movimiento de entrada
+    INSERT INTO vehicle_movements (id, vehicle_id, parking_space_id, action)
+    VALUES (movement_id, vehicle_plate, parking_space_id, 'entrada');
+
+    -- Actualizar el estado del espacio de estacionamiento
+    UPDATE parking_spaces
+    SET is_available = FALSE, vehicle_id = vehicle_plate, updated_at = NOW()
+    WHERE id = parking_space_id;
+END $$
+
+-- Crear procedimiento para registrar la salida de un vehículo
+CREATE PROCEDURE IF NOT EXISTS apiParqueo.RegisterVehicleExit(
+    IN movement_id VARCHAR(64),
+    IN vehicle_plate VARCHAR(20),
+    IN parking_space_id VARCHAR(64)
+)
+BEGIN
+    DECLARE vehicle_exists BOOLEAN;
+    DECLARE vehicle_in_space BOOLEAN;
+
+    -- Verificar si el vehículo existe
+    SELECT COUNT(*) > 0 INTO vehicle_exists
+    FROM vehicles
+    WHERE plate = vehicle_plate;
+
+    -- Si el vehículo no existe, se genera un error
+    IF NOT vehicle_exists THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo no existe.';
+    END IF;
+
+    -- Verificar si el vehículo está en el espacio de estacionamiento
+    SELECT COUNT(*) > 0 INTO vehicle_in_space
+    FROM vehicle_movements
+    WHERE vehicle_id = vehicle_plate
+    AND parking_space_id = parking_space_id
+    AND action = 'entrada'
+    ORDER BY timestamp DESC LIMIT 1;
+
+    -- Si el vehículo no está en el espacio, se genera un error
+    IF NOT vehicle_in_space THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo no está en el espacio indicado.';
+    END IF;
+
+    -- Insertar el movimiento de salida
+    INSERT INTO vehicle_movements (id, vehicle_id, parking_space_id, action)
+    VALUES (movement_id, vehicle_plate, parking_space_id, 'salida');
+
+    -- Actualizar el estado del espacio de estacionamiento
+    UPDATE parking_spaces
+    SET is_available = TRUE, vehicle_id = NULL, updated_at = NOW()
+    WHERE id = parking_space_id;
+END $$
+
+-- Crear procedimiento para obtener todos los movimientos de vehículos
+CREATE PROCEDURE IF NOT EXISTS apiParqueo.GetVehicleMovements()
+BEGIN
+    SELECT 
+        vm.id AS movement_id,
+        vm.vehicle_id,
+        vm.parking_space_id,
+        vm.action,
+        vm.timestamp,
+        vm.created_at,
+        vm.updated_at
+    FROM 
+        vehicle_movements vm
+    ORDER BY 
+        vm.timestamp DESC;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE IF NOT EXISTS apiParqueo.IsVehicleInParking(
+    IN vehicle_plate VARCHAR(20),
+    IN start_time TIMESTAMP,
+    IN end_time TIMESTAMP
+)
+BEGIN
+    DECLARE vehicle_in_parking BOOLEAN;
+
+    -- Verificar si el vehículo está en el parking dentro del rango de tiempo
+    SELECT COUNT(*) > 0 INTO vehicle_in_parking
+    FROM vehicle_movements vm
+    WHERE vm.vehicle_id = vehicle_plate
+    AND vm.action = 'entrada'
+    AND EXISTS (
+        SELECT 1 FROM vehicle_movements vm_exit
+        WHERE vm_exit.vehicle_id = vm.vehicle_id
+        AND vm_exit.parking_space_id = vm.parking_space_id
+        AND vm_exit.action = 'salida'
+        AND vm_exit.timestamp > vm.timestamp
+        AND vm_exit.timestamp < end_time
+    )
+    AND vm.timestamp < end_time;
+
+    -- Devolver el resultado
+    IF vehicle_in_parking THEN
+        SELECT 'El vehículo está en el parking durante el rango de tiempo especificado.' AS message;
+    ELSE
+        SELECT 'El vehículo NO está en el parking durante el rango de tiempo especificado.' AS message;
+    END IF;
+
+END $$
+
+
+
+CREATE PROCEDURE IF NOT EXISTS apiParqueo.UpdateParkingSpaceInfo(
+    IN old_parking_space_id VARCHAR(64),
+    IN new_parking_space_id VARCHAR(64),
+    IN is_available BOOLEAN
+)
+BEGIN
+    DECLARE reservation_count INT;
+
+    -- Contar las reservas asociadas al antiguo espacio de estacionamiento
+    SELECT COUNT(*) INTO reservation_count
+    FROM reservations
+    WHERE parking_space_id = old_parking_space_id;
+
+    -- Si hay reservas, puedes decidir cómo proceder
+    IF reservation_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede actualizar el espacio de estacionamiento porque tiene reservas asociadas.';
+    ELSE
+        -- Actualizar el ID del espacio de estacionamiento y su disponibilidad
+        UPDATE parking_spaces
+        SET id = new_parking_space_id, 
+            is_available = is_available, 
+            updated_at = NOW()
+        WHERE id = old_parking_space_id;
+    END IF;
+END $$
+
 
 DELIMITER ;
