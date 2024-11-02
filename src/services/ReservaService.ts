@@ -1,12 +1,12 @@
 import IDatabase from '../models/Database/IDatabase'
-import ParkingModelError from '../models/Errors/ParkingModelError'
 import FechaModel from '../models/Parking/FechaModel'
-import ReservaModel from '../models/Parking/ReservaModel'
+import ReservaModel from '../models/Reservas/ReservaModel'
 import VehiculoModel from '../models/Parking/VehiculesModel'
 import { randomUUID } from 'crypto'
 import ReservaModelResponse from '../models/Reservas/ReservaModelResponse'
 import LoggerController, { defaultEntryLog } from '../controllers/LoggerController'
-
+import ParkingModelError from '../models/Errors/ParkingModelError'
+import ReservaParkingSpaceCreate from '../models/Reservas/ReservaParkingSpaceCreate'
 
 class ReservaService {
   constructor(private readonly db: IDatabase) { }
@@ -17,44 +17,29 @@ class ReservaService {
     vehiculo: VehiculoModel,
     startTime: FechaModel,
     endTime: FechaModel
-  ): Promise<{
-    success: boolean, message: string, detalles: {
-      id: string,
-      user_id: string,
-      parking_space_id: string,
-      vehiculo: string | {
-        make: string,
-        model: string,
-        plate: string
-      },
-      start_time: FechaModel,
-      end_time: FechaModel,
-      created_at: Date,
-      updated_at: Date
-    }
-  }> {
+  ): Promise<ReservaParkingSpaceCreate> {
     const reservationId = randomUUID()
+
+    console.log("reservationId", reservationId)
+    console.log("startTime", startTime)
+    console.log("endTime", endTime)
+    console.log("vehiculo", vehiculo)
+    console.log("parkingSpaceId", parkingSpaceId)
+    console.log("userId", userId)
 
     if (!parkingSpaceId) {
       const primitiveStartTime = startTime.toPrimitives()
-
       const primitiveEndTime = endTime.toPrimitives()
+      const unreservedSpaces: ReservaModelResponse[] = await ReservaModel.getAvailableSpacesInFuture(this.db, primitiveStartTime, primitiveEndTime)
 
-      const unreservedMatch = await this.db.all<ReservaModelResponse[]>(
-        'CALL GetAvailableSpacesInFuture(?, ?);',
-        [primitiveStartTime, primitiveEndTime]
-      );
-      const unreservedSpaces: ReservaModelResponse[] = unreservedMatch[0]
-
-      console.log('unreservedSpaces', unreservedSpaces)
 
       if (unreservedSpaces === null || unreservedSpaces.length === 0) {
         throw new ParkingModelError(
           'No hay plazas disponibles en el horario solicitado'
         )
       }
-      const idx = Math.floor(Math.random() * unreservedSpaces.length)
 
+      const idx = Math.floor(Math.random() * unreservedSpaces.length)
       parkingSpaceId = unreservedSpaces[idx].parking_space_id
     }
     const reserva = new ReservaModel(

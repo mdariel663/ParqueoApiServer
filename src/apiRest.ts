@@ -8,7 +8,8 @@ import MiddlewareErrorHandler from './controllers/middleware/MiddlewareErrors'
 import LogRouter from './routes/logs'
 import UserRouter from './routes/user'
 import ParkingRouter from './routes/parking'
-import SpaceRouter from './routes/spaceParking'
+import ReservaRouter from './routes/reserva'
+
 dotenv.config()
 const { PORT_SERVER } = process.env
 
@@ -26,7 +27,7 @@ app.disable('x-powered-by')
 app.use('/api/v2/logs', LogRouter)
 app.use('/api/v2/user', UserRouter)
 app.use('/api/v2/parking', ParkingRouter)
-app.use('/api/v2/parking-spaces', SpaceRouter)
+app.use('/api/v2/reservas', ReservaRouter)
 
 try {
   app.listen(port, () => {

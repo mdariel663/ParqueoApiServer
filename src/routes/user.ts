@@ -9,9 +9,12 @@ const router = express.Router()
 
 router.get('/', onlyAuthenticatedAccess, UserController.getCurrent)
 router.get('/list', onlyAuthenticatedAccess, onlyAdminAccess, UserController.getUsers)
-router.post('/', UserController.create)
+
 router.put('/', onlyAuthenticatedAccess, UserController.update)
-router.delete('/', onlyAuthenticatedAccess, UserController.delete)
+
+router.post('/', UserController.create)
 router.post('/login', UserController.login)
+
+router.delete('/', onlyAuthenticatedAccess, UserController.delete)
 
 export default router

@@ -4,13 +4,13 @@ import PasswordRequest from "../models/User/PasswordRequest";
 import RoleRequest from "../models/User/RoleRequest";
 import UserNameRequest from "../models/User/UserNameRequest";
 import { UUID } from "crypto";
-import UserModelError from "../models/Errors/UserModelError";
 import PhoneRequest from "../models/User/PhoneRequest";
 import UserFilterModel from "../models/UserFilterModel";
 import User from "../models/User/UserInterface";
 import UserResponse, { UserLoginResponse } from "../models/User/UserResponse";
 import UserLogged from "../models/User/UserInterface";
 import LoggerController, { defaultEntryLog } from "../controllers/LoggerController";
+import UserModelError from "../models/Errors/UserModelError";
 
 class UserService {
   static async deleteUser(currentUserId: UUID, userDeleteId: UUID | undefined): Promise<{ success: boolean; message: string; userId: UUID }> {
