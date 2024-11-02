@@ -11,7 +11,7 @@ const { URI_MONGODB, DB_MONGODB, COLLECT_NAME_MONGODB } = process.env
 
 if (isNulledFields([URI_MONGODB, DB_MONGODB, COLLECT_NAME_MONGODB])) {
   console.error('[dblog] - Faltan datos para conectar a la base de datos de registros')
-  exit(-255)
+  exit(1)
 }
 
 
@@ -42,7 +42,9 @@ class MongoDatabase implements IDatabaseLog {
   private async connect(): Promise<void> {
     try {
       await this.client.connect()
-      console.log('[dblog] - Conexión exitosa a la base de datos de registros MongoDB')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[dblog] - Conexión exitosa a la base de datos de registros MongoDB')
+      }
       this.clientisConnected = true
     } catch (error: unknown) {
       if (error instanceof MongoServerSelectionError) {

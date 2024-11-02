@@ -1,5 +1,5 @@
 import { LogEntry } from "../models/Database/IDatabaseLog"
-import controllers from "./controllers"
+import { persistentLog } from "./controllers";
 export const defaultEntryLog: LogEntry = {
     timestamp: new Date(),
     level: 'info',
@@ -41,7 +41,7 @@ class LoggerController {
 
 
     static sendLog(newEntry: LogEntry): void {
-        controllers.persistentLog.writeLog(newEntry).catch((error: unknown) => {
+        persistentLog.writeLog(newEntry).catch((error: unknown) => {
             console.warn('Error al registrar el log', error);
         })
     }

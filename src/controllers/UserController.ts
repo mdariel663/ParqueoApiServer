@@ -45,8 +45,10 @@ interface LoginRequestBody {
 class UserController {
   static delete = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
-      const { currentUserId, userId } = req.body as DeleteUserRequestBody;
-      const result = await UserService.deleteUser(currentUserId, userId)
+      const { userIdDelete } = req.params as { userIdDelete: UUID };
+      console.log("userIdDelete", userIdDelete)
+      const { currentUserId } = req.body as { currentUserId: UUID };
+      const result = await UserService.deleteUser(currentUserId, userIdDelete)
       return resp.status(200).send(result)
     } catch (err: unknown) {
       return ErrorHandler.handleError(
@@ -83,7 +85,6 @@ class UserController {
       });
       return resp.status(200).send(result);
     } catch (err: unknown) {
-      console.log('error', err)
       return ErrorHandler.handleError(resp, err, 'Error al crear usuario');
     }
   };
@@ -104,7 +105,6 @@ class UserController {
       // Ensure userId is either a string or undefined
       const userId = reqUserId ?? currentUserId;
 
-      console.log("userId -> DEV PARAM", userId);
       const model = new UserModel();
       const user = await model.getCurrentUser(currentUserId);
 
@@ -146,8 +146,6 @@ class UserController {
         if (value === null) return;  // Skip if null
 
         const request = new RequestClass(value);
-
-        console.log("request", request);
 
         if (!request.isValid) {
           throw new UserModelError(request.messageError ?? 'Error de validación');
@@ -194,7 +192,6 @@ class UserController {
     try {
       const { currentUserId } = req.body as { currentUserId: UUID };
       const result = await UserService.getCurrentUser(currentUserId)
-      console.log("result", result)
       return resp.status(200).send({ success: true, ...result })
     } catch (err: unknown) {
       return ErrorHandler.handleError(
@@ -220,7 +217,6 @@ class UserController {
     try {
       const result: UserLoginResponse = await UserService.loginUser(email, phone, password)
       LoggerController.sendLogin(result.id, true)
-      console.log("result", result)
       return resp.status(200).send(result)
     } catch (err: unknown) {
       LoggerController.sendLogin(email ?? phone, false)

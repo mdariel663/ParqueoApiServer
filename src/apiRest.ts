@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import express, { json } from 'express'
 import cors from 'cors'
+import { checkDatabaseConnections } from './controllers/controllers'
 
 import MiddlewareErrorHandler from './controllers/middleware/MiddlewareErrors'
 
@@ -29,10 +30,13 @@ app.use('/api/v2/user', UserRouter)
 app.use('/api/v2/parking', ParkingRouter)
 app.use('/api/v2/reservas', ReservaRouter)
 
-try {
+async function startServer() {
+  await checkDatabaseConnections();
   app.listen(port, () => {
-    console.log(`Servidor corriendo en puerto ${port}`)
-  })
-} catch (error) {
-  console.error('Error inicializando el servidor:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Servidor corriendo en puerto ${port}`);
+    }
+  });
 }
+startServer();
+export default app;

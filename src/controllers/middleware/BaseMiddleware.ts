@@ -9,7 +9,9 @@ export default class BaseMiddleware implements IMiddleware {
     protected readonly tokenService: ITokenModel,
     protected readonly dbSql: IDatabase
   ) {
-    console.log('Middleware Iniciatialized ...')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Middleware Iniciatialized ...')
+    }
   }
 
 

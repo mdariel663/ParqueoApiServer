@@ -6,18 +6,18 @@ import EmailRequest from './EmailRequest'
 import PasswordRequest from './PasswordRequest'
 import RoleRequest from './RoleRequest'
 import UserNameRequest from './UserNameRequest'
-import controllers from '../../controllers/controllers'
 import PhoneRequest from './PhoneRequest'
 import FilterModel from '../FilterModel'
 import User from './UserInterface'
 import UserResponse from './UserResponse'
 import UserLogged from './UserInterface'
 import UserModelError from '../Errors/UserModelError'
+import { databaseRepository } from '../../controllers/controllers'
 export class UserFilterModel extends FilterModel { }
 
 class UserModel {
   constructor(
-    private readonly db: IDatabase = controllers.databaseRepository
+    private readonly db: IDatabase = databaseRepository
   ) { }
 
   getUsers = async (): Promise<User[]> => {

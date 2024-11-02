@@ -16,7 +16,9 @@ export default class ReservaModelResponse {
         (async (): Promise<void> => {
             await this.getVehicle()
         })().catch((error) => {
-            console.log('Error al obtener el vehiculo:', error)
+            if (process.env.NODE_ENV === 'development') {
+                console.log('Error al obtener el vehiculo:', error)
+            }
         })
     }
 

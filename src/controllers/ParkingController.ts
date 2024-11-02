@@ -2,18 +2,18 @@ import { Request, Response } from "express"
 import { validateFields } from "./Utils"
 
 import ParkingModelError from "../models/Errors/ParkingModelError"
-import controllers from "./controllers"
 import ErrorHandler from "./HandleErrors"
 import LoggerController, { defaultEntryLog } from "./LoggerController"
 import ParkingService from "../services/ParkingService"
 import ParkingModel from "../models/ParkingModel"
 import { ParkingSpaceRow } from "../models/Parking/ParkingSpace"
+import { databaseRepository } from "./controllers"
 
 export default class ParkingController {
     static getAllSpaces = async (req: Request, res: Response): Promise<Response | void> => {
         const { currentUserId } = req.body as { currentUserId: string }
         try {
-            const parkingService = new ParkingService(currentUserId, controllers.databaseRepository);
+            const parkingService = new ParkingService(currentUserId, databaseRepository);
             const parkingSpaces: ParkingSpaceRow[] = await parkingService.getAllSpaces()
 
             if (parkingSpaces !== null && parkingSpaces.length === 0) {
@@ -67,7 +67,7 @@ export default class ParkingController {
         const { currentUserId } = req.body as { currentUserId: string }
 
         try {
-            const parkingService = new ParkingService(currentUserId, controllers.databaseRepository);
+            const parkingService = new ParkingService(currentUserId, databaseRepository);
 
             let detailsParkingSpace: Array<ParkingSpaceRow> | null = null;
 
@@ -126,8 +126,7 @@ export default class ParkingController {
         const { currentUserId } = req.body as { currentUserId: string }
 
         try {
-            const dbObject = controllers.databaseRepository;
-            const existingSpace = await ParkingModel.getSpaceById(dbObject, spaceId)
+            const existingSpace = await ParkingModel.getSpaceById(databaseRepository, spaceId)
 
             if (existingSpace.length > 0) {
                 throw new ParkingModelError('Ya existe un parking con el mismo nombre')
@@ -139,7 +138,7 @@ export default class ParkingController {
                 throw new ParkingModelError(errMessage)
             }
 
-            const newSpace = await ParkingModel.createSpace(dbObject, spaceId)
+            const newSpace = await ParkingModel.createSpace(databaseRepository, spaceId)
 
             if (newSpace === null) {
                 throw new ParkingModelError("Hubo un error al crear el Espacio de Almacenamiento")
@@ -202,7 +201,7 @@ export default class ParkingController {
 
             const parkingService = new ParkingService(
                 userId,
-                controllers.databaseRepository
+                databaseRepository
             )
 
             const result = await parkingService.updateparkingSpace(spaceId, spaceDetails)
@@ -250,7 +249,7 @@ export default class ParkingController {
         try {
             const { parkingSpaceId } = req.params as { parkingSpaceId: string }
 
-            const parkingService = new ParkingService(currentUserId, controllers.databaseRepository);
+            const parkingService = new ParkingService(currentUserId, databaseRepository);
             const detailsParkingSpace = await parkingService.getParkingSpaceById(parkingSpaceId);
 
             if (detailsParkingSpace === null) {
@@ -304,7 +303,7 @@ export default class ParkingController {
                 }
                 const parkingService = new ParkingService(
                     currentUserId,
-                    controllers.databaseRepository
+                    databaseRepository
                 )
                 const result = await parkingService.deleteparkingSpace(spaceId);
 

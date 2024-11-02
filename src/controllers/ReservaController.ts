@@ -6,12 +6,12 @@ import UserLogged from "../models/User/UserInterface";
 import UserModel from "../models/User/UserModel";
 import ParkingService from "../services/ParkingService";
 import ReservaService from "../services/ReservaService";
-import controllers from "./controllers";
 import ErrorHandler from "./HandleErrors";
 import LoggerController, { defaultEntryLog } from "./LoggerController";
 import { validateFields } from "./Utils";
 import ParkingModelError from "../models/Errors/ParkingModelError";
 import UserModelErrorAuth from "../models/Errors/UserModelError";
+import { databaseRepository } from "./controllers";
 
 export default class ReservaController {
 
@@ -30,7 +30,7 @@ export default class ReservaController {
                 throw new ParkingModelError(errMessage);
             }
 
-            const userModel = new UserModel(controllers.databaseRepository);
+            const userModel = new UserModel(databaseRepository);
             const currentUser = await userModel.getCurrentUser(currentUserId);
 
             if (!currentUser) {
@@ -49,7 +49,7 @@ export default class ReservaController {
                 throw new ParkingModelError('La fecha de inicio debe ser anterior a la de terminación');
             }
 
-            const reservasService = new ReservaService(controllers.databaseRepository);
+            const reservasService = new ReservaService(databaseRepository);
             const result = await reservasService.updateReserva(reservationId, vehiculo, startDate, endDate); // Assuming this method exists
 
             if (result === null || result.success === false) {
@@ -108,7 +108,7 @@ export default class ReservaController {
                 throw new ParkingModelError(errMessage);
             }
 
-            const user = new UserModel(controllers.databaseRepository);
+            const user = new UserModel(databaseRepository);
             const currentUser = await user.getCurrentUser(currentUserId);
 
 
@@ -135,7 +135,7 @@ export default class ReservaController {
                 throw new ParkingModelError('La fecha de inicio debe ser anterior a la de terminación');
             }
 
-            const parkingService = new ParkingService(currentUserId, controllers.databaseRepository);
+            const parkingService = new ParkingService(currentUserId, databaseRepository);
             const result = await parkingService.reservarPlaza(vehiculo, startDate, endDate, parkingSpaceId);
 
             if (result === null) {
@@ -158,7 +158,7 @@ export default class ReservaController {
 
         const { currentUserId } = req.body as { currentUserId: UUID }
         try {
-            const userModel: UserModel = new UserModel(controllers.databaseRepository)
+            const userModel: UserModel = new UserModel(databaseRepository)
             const currentUser: UserLogged | null = await userModel.getCurrentUser(currentUserId)
 
             if (currentUser === null) {
@@ -169,7 +169,7 @@ export default class ReservaController {
                 throw new UserModelErrorAuth('No tienes permisos para acceder a esta información')
             }
 
-            const reservasService = new ReservaService(controllers.databaseRepository);
+            const reservasService = new ReservaService(databaseRepository);
             const reservas = await reservasService.getAllReservas();
 
 
@@ -215,7 +215,7 @@ export default class ReservaController {
                 throw new ParkingModelError('Datos de reserva no proporcionados')
             }
 
-            const reservasService = new ReservaService(controllers.databaseRepository)
+            const reservasService = new ReservaService(databaseRepository)
             const result = await reservasService.eliminarReserva(reservationId)
 
 

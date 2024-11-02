@@ -21,10 +21,14 @@ class MySQLDatabase implements IDatabase {
 
   constructor() {
 
-    console.log('[db] - Conectando a la base de datos MySQL...')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[db] - Conectando a la base de datos MySQL...')
+    }
     this.connect().catch((error) => {
-      console.error('[db] - Error al conectar a la base de datos:', error)
-      exit(-255)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[db] - Error al conectar a la base de datos:', error)
+      }
+      exit(1)
     })
   }
 
@@ -47,11 +51,10 @@ class MySQLDatabase implements IDatabase {
         port: process.env.DB_PORT_MYSQL ? Number(process.env.DB_PORT) : 3306
       })
       this.clientisConnected = true;
-      console.log('[db] - Conexión exitosa a la base de datos MySQL')
       return true
     } catch (error) {
       console.error('[db] - Error de conexión:', error)
-      exit(-255);
+      exit(1);
     }
   }
 
