@@ -5,7 +5,7 @@ import { checkDatabaseConnections, databaseRepository, databaseRepositoryMongo }
 
 let server: http.Server | undefined
 let port = process.env.PORT ?? 3000
-export const closeDatabaseConnections = async () => {
+export const closeDatabaseConnections = async (): Promise<void> => {
   if (databaseRepository == null || databaseRepositoryMongo == null) {
     console.error('No se puede cerrar la conexión a la base de datos, ya no se ha inicializado')
     return
@@ -14,7 +14,7 @@ export const closeDatabaseConnections = async () => {
   await databaseRepository.closeConnection();
   await databaseRepositoryMongo.closeConnection();
 }
-export const startServer = async () => {
+export const startServer = async (): Promise<http.Server> => {
   if (!server) {
     console.log('Iniciando el servidor...')
     await checkDatabaseConnections()
@@ -25,7 +25,7 @@ export const startServer = async () => {
   return server
 }
 
-export const closeServer = async () => {
+export const closeServer = async (): Promise<void> => {
   if (server) {
     await new Promise((resolve) => server?.close(resolve)).catch((error) => {
       console.error('Error al cerrar el servidor:', error)
