@@ -1,9 +1,7 @@
 import { Response } from 'express'
-import TokenModelError from '../models/Errors/TokenModelError'
-import UserModelError, {
-  UserModelErrorAuth
-} from '../models/Errors/UserModelError'
 import ParkingModelError from '../models/Errors/ParkingModelError'
+import TokenModelError from '../models/Errors/TokenModelError'
+import UserModelError, { UserModelErrorAuth } from '../models/Errors/UserModelError'
 
 export default class ErrorHandler {
   static handleError = (
