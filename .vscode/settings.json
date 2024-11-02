@@ -1,0 +1,22 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/node_modules": true,
+        "**.code-workspace": true,
+        "**.package-lock.json": true,
+    },
+  {
+  "standard.enable": true,
+  "standard.engine": "ts-standard",
+  "standard.autoFixOnSave": true
+}},{
+
+}
+
+"editor.formatOnSave": true
+}
