@@ -26,7 +26,6 @@ class ReservaModel {
 
   static async getAvailableSpacesInFuture(db: IDatabase, primitiveStartTime: string, primitiveEndTime: string): Promise<ReservaModelResponse[]> {
     const [unreservedSpaces] = await db.all<ReservaModelResponse[]>('CALL GetAvailableSpacesInFuture(?, ?);', [primitiveStartTime, primitiveEndTime]);
-    console.log("unreservedSpaces", unreservedSpaces)
     if (unreservedSpaces === null || unreservedSpaces.length === 0) {
       return []
     }

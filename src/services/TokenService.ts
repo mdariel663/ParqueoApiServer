@@ -25,12 +25,9 @@ class TokenService implements ITokenModel {
       .catch((err: unknown) => {
         const error = err as { "message": string }
         if (error instanceof TokenModelError) {
-          //  console.log("error xd", error)
-          //            throw new TokenModelError(error.message)
           reject(error.message)
         }
         reject("Error desconocido con respecto al token")
-        //throw new TokenModelError("Error desconocido con respecto al token")
       })
     )
   }

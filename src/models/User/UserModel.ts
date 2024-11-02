@@ -130,7 +130,6 @@ class UserModel {
       `SELECT ${filterModel.getFieldsToSelect()} FROM users WHERE email = ? OR phone = ? LIMIT ${limit}`,
       [user, password]
     );
-    console.log("result", result)
     return [result]; //Return userId is found
   }
 

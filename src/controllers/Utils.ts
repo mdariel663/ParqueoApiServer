@@ -13,7 +13,6 @@ const isNulledFields = (fields: unknown[]): boolean => {
       return true
     }
   }
-  console.log(fields)
   return false
 }
 const generateUniqueId = (): string => {

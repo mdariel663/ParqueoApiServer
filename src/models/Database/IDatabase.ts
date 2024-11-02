@@ -11,18 +11,3 @@ interface IDatabase {
 }
 
 export default IDatabase;
-
-/*
-// eslint-disable @typescript-eslint/no-explicit-any
-interface IDatabase {
-  get: (query: string, params: any[]) => Promise<any>
-
-  all: (query: string, params: any[]) => Promise<any>
-
-  run: (query: string, params: any[]) => Promise<any>
-
-  getConnectionState: () => boolean;
-}
-
-export default IDatabase;
-*/

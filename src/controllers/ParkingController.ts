@@ -73,15 +73,12 @@ export default class ParkingController {
 
             if (spaceId !== undefined) {
                 detailsParkingSpace = await parkingService.getParkingSpaceById(spaceId);
-                console.log('detailsParkingSpace', detailsParkingSpace)
-
                 if (detailsParkingSpace === null) {
                     throw new ParkingModelError('No se puede obtener la reserva de la plaza');
                 }
             } else {
 
                 detailsParkingSpace = await parkingService.getAllSpaces();
-                console.log('detailsParkingSpace', detailsParkingSpace)
 
                 if (detailsParkingSpace === null) {
                     throw new ParkingModelError('No se puede obtener la reserva de la plaza');
@@ -191,7 +188,6 @@ export default class ParkingController {
             new_parking_space_id: string, is_available: boolean | undefined
         }
         spaceDetails = { new_parking_space_id: new_parking_space_id, is_available: is_available }
-        console.log(" Space: ", spaceDetails)
         let { userId, currentUserId } = req.body as { userId: string, currentUserId: string }
 
 
@@ -211,7 +207,6 @@ export default class ParkingController {
 
             const result = await parkingService.updateparkingSpace(spaceId, spaceDetails)
 
-            console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxx", result)
             if (!result) {
                 throw new ParkingModelError('No se pudo modificar la plaza')
             }
@@ -257,7 +252,6 @@ export default class ParkingController {
 
             const parkingService = new ParkingService(currentUserId, controllers.databaseRepository);
             const detailsParkingSpace = await parkingService.getParkingSpaceById(parkingSpaceId);
-            console.log('detailsParkingSpace', detailsParkingSpace)
 
             if (detailsParkingSpace === null) {
                 throw new ParkingModelError('No se puede obtener la reserva de la plaza');
@@ -305,7 +299,6 @@ export default class ParkingController {
 
 
             try {
-                console.log("xyyyyyyyyxxxxxxxxxxxxxxx", spaceId)
                 if (spaceId === undefined) {
                     throw new ParkingModelError('No se pudo eliminar la plaza')
                 }

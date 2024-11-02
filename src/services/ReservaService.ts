@@ -9,14 +9,14 @@ import ParkingModelError from '../models/Errors/ParkingModelError'
 import ReservaParkingSpaceCreate from '../models/Reservas/ReservaParkingSpaceCreate'
 
 class ReservaService {
-  async updateReserva(reservaId: string, vehiculo: VehiculoModel, startDate: FechaModel, endDate: FechaModel) {
-    // Step 1: Check if the reservation exists
+  async updateReserva(reservaId: string, vehiculo: VehiculoModel, startDate: FechaModel, endDate: FechaModel): Promise<ReservaParkingSpaceCreate> {
+
+
     const existingReserva = await ReservaModel.getReservaById(this.db, reservaId);
-    if (!existingReserva) {
-      throw new ParkingModelError('No se encontró la reserva con el ID proporcionado');
+    if (existingReserva === null) {
+      throw new ParkingModelError('No se puede editar una reserva que no existe');
     }
 
-    // Step 2: Validate vehicle and date details
     if (!vehiculo.isValid) {
       throw new ParkingModelError('Datos del vehículo no válidos');
     } else if (!startDate.isValid || !endDate.isValid) {
@@ -24,8 +24,6 @@ class ReservaService {
     } else if (startDate.fecha >= endDate.fecha) {
       throw new ParkingModelError('La fecha de inicio debe ser anterior a la de terminación');
     }
-
-    // Step 3: Prepare the updated reservation
 
     const updatedReserva = new ReservaModel(
       reservaId,
@@ -35,11 +33,10 @@ class ReservaService {
       startDate,
       endDate,
       existingReserva.created_at,
-      new Date() // Assuming you want to update the modified date
+      new Date()
     );
 
-    // Step 4: Update the reservation in the database
-    const result = await ReservaModel.updateReserva(this.db, updatedReserva); // Assuming this method exists
+    const result = await ReservaModel.updateReserva(this.db, updatedReserva);
 
     if (result.affectedRows === 0) {
       throw new ParkingModelError('No se pudo actualizar la reserva');
@@ -75,14 +72,6 @@ class ReservaService {
     endTime: FechaModel
   ): Promise<ReservaParkingSpaceCreate> {
     const reservationId = randomUUID()
-
-    console.log("reservationId", reservationId)
-    console.log("startTime", startTime)
-    console.log("endTime", endTime)
-    console.log("vehiculo", vehiculo)
-    console.log("parkingSpaceId", parkingSpaceId)
-    console.log("userId", userId)
-
     if (!parkingSpaceId) {
       const primitiveStartTime = startTime.toPrimitives()
       const primitiveEndTime = endTime.toPrimitives()

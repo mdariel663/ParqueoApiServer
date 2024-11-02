@@ -29,9 +29,6 @@ export default class ErrorHandler {
         break
     }
 
-    console.log("defaultMessage", defaultMessage)
-    console.log("catcher  code", error)
-
     return res.status(code).send({ message: defaultMessage, success: false })
   }
 }

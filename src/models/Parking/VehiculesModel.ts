@@ -8,23 +8,6 @@ export interface VehiculoPrimitives {
   model: string
   plate: string
 }
-/* export class VehicleModel {
-  constructor(
-    private readonly id: string,
-    private readonly make: string,
-    private readonly model: string,
-    private readonly plate: string
-  ) { }
-
-  toJSON(): {} {
-    return {
-      id: this.id,
-      make: this.make,
-      model: this.model,
-      plate: this.plate
-    }
-  }
-} */
 
 class VehiculoModel {
   make!: string // marca
@@ -40,8 +23,6 @@ class VehiculoModel {
   static getVehiculoByPlate = async (db: IDatabase, plateId: string): Promise<VehiculoModel | null> => {
     try {
       const result = await db.get<VehiculoPrimitives>('SELECT  make, model, plate FROM vehicles WHERE plate = ? LIMIT 1;', [plateId])
-      console.log("Test getVehiculoByPlate")
-      console.log("result", result)
       const { plate, make, model } = result
       if (!plate || !make || !model) {
         return null

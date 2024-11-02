@@ -15,6 +15,6 @@ router.put('/', onlyAuthenticatedAccess, UserController.update)
 router.post('/', UserController.create)
 router.post('/login', UserController.login)
 
-router.delete('/', onlyAuthenticatedAccess, UserController.delete)
+router.delete('/:userIdDelete', onlyAuthenticatedAccess, UserController.delete)
 
 export default router

@@ -42,7 +42,7 @@ class LoggerController {
 
     static sendLog(newEntry: LogEntry): void {
         controllers.persistentLog.writeLog(newEntry).catch((error: unknown) => {
-            console.log('Error al registrar el log', error);
+            console.warn('Error al registrar el log', error);
         })
     }
 }

@@ -111,7 +111,7 @@ export default class ReservaController {
             const user = new UserModel(controllers.databaseRepository);
             const currentUser = await user.getCurrentUser(currentUserId);
 
-            // Verificar si currentUser es nulo
+
             if (!currentUser) {
                 throw new UserModelErrorAuth('Usuario no autenticado');
             }
@@ -160,7 +160,7 @@ export default class ReservaController {
         try {
             const userModel: UserModel = new UserModel(controllers.databaseRepository)
             const currentUser: UserLogged | null = await userModel.getCurrentUser(currentUserId)
-            // Verifica si currentUser es nulo
+
             if (currentUser === null) {
                 throw new UserModelErrorAuth('Usuario actual no encontrado');
             }
@@ -191,7 +191,6 @@ export default class ReservaController {
                 details: reservas
             });
         } catch (error: unknown) {
-            console.log('el error más pendejo', error);
             LoggerController.sendLog({
                 ...defaultEntryLog,
                 level: "error",

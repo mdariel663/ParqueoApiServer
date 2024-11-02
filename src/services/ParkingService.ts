@@ -37,8 +37,6 @@ class ParkingService {
   async getParkingSpaceById(parkingSpaceId: String): Promise<Array<ParkingSpaceRow>> {
     try {
       const result = await this.db.get<Array<ParkingSpaceRow>>('CALL GetParkingSpaceById(?);', [parkingSpaceId])
-      console.log("Test PARKINGSPACEBYID")
-      console.log("result", result)
       return result
     } catch (error) {
       console.error(error)
@@ -97,8 +95,6 @@ class ParkingService {
           endTime
         )
       }
-
-      console.log('soyt pros', parkingSpace)
       throw new ParkingError('No hay plazas disponibles en el horario solicitado');
 
     } catch (error: unknown) {
@@ -106,7 +102,6 @@ class ParkingService {
         throw error
       }
       const err = error as { sqlMessage: string, code: string };
-      console.log("eee", err)
       if (err.sqlMessage && err.code === 'ER_SIGNAL_EXCEPTION') {
         throw new ReservaModelError(err.sqlMessage)
       } else {
@@ -118,8 +113,7 @@ class ParkingService {
   async checkAvailableSpace(startTime: FechaModel, endTime: FechaModel): Promise<ParkingSpaceRow | null> {
     const primitiveStartTime = startTime.toPrimitives()
     const primitiveEndTime = endTime.toPrimitives()
-    const [rows] = await this.db.all<ParkingSpaceRow[]>('CALL CheckAvailableSpaces(?, ?);', [primitiveStartTime, primitiveEndTime])
-    console.log("available:::::: ", rows)
+    const rows = await this.db.all<ParkingSpaceRow>('CALL CheckAvailableSpaces(?, ?);', [primitiveStartTime, primitiveEndTime])
     return rows[0]
   }
 
@@ -135,7 +129,6 @@ class ParkingService {
       spaceDetails
     ).catch((error: unknown) => {
       if (error instanceof ParkingModelError) {
-        console.log("error", error)
         throw new ParkingError((error as { message: string }).message)
       }
       throw new ParkingError('Error al actualizar el espacio de aparcamiento')

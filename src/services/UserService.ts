@@ -195,7 +195,6 @@ class UserService {
   static getCurrentUser = async (userId: UUID): Promise<UserLogged> => {
     const userModel: UserModel = new UserModel();
     const user = await userModel.getCurrentUser(userId);
-    console.log("user", user)
     if (user === null) {
       throw new UserModelError("Usuario actual no encontrado");
     }
@@ -247,7 +246,6 @@ class UserService {
           return user;
 
         }).catch((_e: unknown) => {
-          console.log("error", _e)
           if (emailRequest) {
             LoggerController.sendLog({
               ...defaultEntryLog,
