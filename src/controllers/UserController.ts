@@ -13,11 +13,6 @@ import { UserLoginResponse } from '../models/User/UserResponse'
 import LoggerController from './LoggerController'
 import UserModelError, { UserModelErrorBadRequest } from '../models/Errors/UserModelError'
 
-interface DeleteUserRequestBody {
-  currentUserId: UUID;
-  userId?: UUID; // userId es opcional
-}
-
 interface CreateUserRequestBody {
   name: string;
   email: string;

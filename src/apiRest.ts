@@ -10,6 +10,7 @@ import LogRouter from './routes/logs'
 import UserRouter from './routes/user'
 import ParkingRouter from './routes/parking'
 import ReservaRouter from './routes/reserva'
+import { exit } from 'process'
 
 dotenv.config()
 const { PORT_SERVER } = process.env
@@ -30,7 +31,7 @@ app.use('/api/v2/user', UserRouter)
 app.use('/api/v2/parking', ParkingRouter)
 app.use('/api/v2/reservas', ReservaRouter)
 
-async function startServer() {
+async function startServer(): Promise<void> {
   await checkDatabaseConnections();
   app.listen(port, () => {
     if (process.env.NODE_ENV === 'development') {
@@ -38,5 +39,8 @@ async function startServer() {
     }
   });
 }
-startServer();
+startServer().catch((error) => {
+  console.error('Error al iniciar el servidor:', error);
+  exit(1);
+});
 export default app;
