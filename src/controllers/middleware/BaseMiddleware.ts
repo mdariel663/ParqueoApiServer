@@ -9,7 +9,7 @@ export default class BaseMiddleware implements IMiddleware {
     protected readonly tokenService: ITokenModel,
     protected readonly dbSql: IDatabase
   ) {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'production') {
       console.log('Middleware Iniciatialized ...')
     }
   }

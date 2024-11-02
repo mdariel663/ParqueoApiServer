@@ -18,8 +18,8 @@ export const databaseRepositoryMongo: IDatabaseLog = new MongoDatabase();
 //console.log("[db] - Esperando conexión con base de datos...");
 //console.log("[db] - Esperando conexión con base de datos de registros...");
 
-const waiterMs = 5000; // en ms
-const counterMax = 5;
+const waiterMs = 3000; // en ms
+const counterMax = 10;
 let counter = 0;
 
 export const checkDatabaseConnections = (): Promise<boolean> => {
@@ -58,6 +58,6 @@ export const middleware: IMiddleware = new Middleware(tokenService, databaseRepo
 export const onlyAuthenticatedAccess = middleware.onlyAuthenticated;
 export const onlyAdminAccess = middleware.authorizeAdmin;
 export const onlyStaffAccess = middleware.authorizeStaff;
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'production') {
     console.log("[server] - Iniciando Servidor Completamente....");
 }

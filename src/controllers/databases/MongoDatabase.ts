@@ -42,7 +42,7 @@ class MongoDatabase implements IDatabaseLog {
   private async connect(): Promise<void> {
     try {
       await this.client.connect()
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         console.log('[dblog] - Conexión exitosa a la base de datos de registros MongoDB')
       }
       this.clientisConnected = true

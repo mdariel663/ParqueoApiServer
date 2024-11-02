@@ -41,8 +41,8 @@ class UserController {
   static delete = async (req: express.Request, resp: express.Response): Promise<express.Response> => {
     try {
       const { userIdDelete } = req.params as { userIdDelete: UUID };
-      console.log("userIdDelete", userIdDelete)
       const { currentUserId } = req.body as { currentUserId: UUID };
+
       const result = await UserService.deleteUser(currentUserId, userIdDelete)
       return resp.status(200).send(result)
     } catch (err: unknown) {
