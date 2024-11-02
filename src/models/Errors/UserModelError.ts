@@ -9,13 +9,13 @@ export default class UserModelError extends Error {
 
 
 
-export class UserModelErrorBadRequest extends UserModelError {
+export class UserModelErrorBadRequest extends Error {
   constructor(message: string) {
     super(message)
     this.name = 'UserModelErrorBadRequest'
   }
 }
-export class UserModelErrorAuth extends UserModelError {
+export class UserModelErrorAuth extends Error {
   constructor(message: string) {
     super(message)
     this.name = 'UserModelErrorAuth'

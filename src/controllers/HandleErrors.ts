@@ -11,24 +11,25 @@ export default class ErrorHandler {
     code = 500
   ): Response => {
     switch (true) {
-      case error instanceof UserModelError ||
-        error instanceof ParkingModelError:
-        code = 400
-        defaultMessage = error.message
-        break
       case error instanceof TokenModelError:
         code = 401
         defaultMessage = error.message
         break
+
       case error instanceof UserModelErrorAuth:
         code = 403
+        defaultMessage = error.message
+        break
+
+      case error instanceof UserModelError ||
+        error instanceof ParkingModelError:
+        code = 400
         defaultMessage = error.message
         break
       default:
         defaultMessage = "Error interno del servidor"
         break
     }
-
     return res.status(code).send({ message: defaultMessage, success: false })
   }
 }

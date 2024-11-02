@@ -1,6 +1,4 @@
-import ParkingModelError from "./ParkingModelError";
-
-export default class ReservaModelError extends ParkingModelError {
+export default class ReservaModelError extends Error {
     constructor(message: string) {
         super(message);
     }

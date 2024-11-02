@@ -23,7 +23,7 @@ class Middleware extends BaseMiddleware {
       if (userData === null || userData === undefined) {
         throw new UserModelError('Usuario invalido o no existe')
       } else if (userData.role !== 'empleado' && userData.role !== 'admin') {
-        throw new UserModelError('No tienes permisos para acceder a esta información')
+        throw new UserModelErrorAuth('No tienes permisos para acceder a esta información')
       }
       return next()
     } catch (err: unknown) {
@@ -44,7 +44,7 @@ class Middleware extends BaseMiddleware {
       if (userData === null || userData === undefined) {
         throw new UserModelError('Usuario invalido o no existe')
       } else if (userData.role !== 'admin') {
-        throw new UserModelError('No tienes permisos para acceder a esta información')
+        throw new UserModelErrorAuth('No tienes permisos para acceder a esta información')
       }
       return next()
     } catch (err: unknown) {
