@@ -5,6 +5,25 @@ import ReservaModelResponse from './ReservaModelResponse'
 
 
 class ReservaModel {
+  static async updateReserva(db: IDatabase, updatedReserva: ReservaModel): Promise<{ affectedRows: number }> {
+    const result = await db.run(
+      'UPDATE reservations SET user_id = ?, parking_space_id = ?, vehicle_id = ?, start_time = ?, end_time = ?, updated_at = ? WHERE id = ?',
+      [
+        updatedReserva.user_id,
+        updatedReserva.parking_space_id,
+        typeof updatedReserva.vehiculo === 'string'
+          ? updatedReserva.vehiculo
+          : JSON.stringify(updatedReserva.vehiculo),
+        updatedReserva.start_time.toPrimitives(),
+        updatedReserva.end_time.toPrimitives(),
+        new Date(), // Set current date as updated_at
+        updatedReserva.id
+      ]
+    );
+
+    return result; // This should contain the affected rows
+  }
+
   static async getAvailableSpacesInFuture(db: IDatabase, primitiveStartTime: string, primitiveEndTime: string): Promise<ReservaModelResponse[]> {
     const [unreservedSpaces] = await db.all<ReservaModelResponse[]>('CALL GetAvailableSpacesInFuture(?, ?);', [primitiveStartTime, primitiveEndTime]);
     console.log("unreservedSpaces", unreservedSpaces)

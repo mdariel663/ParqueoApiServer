@@ -8,9 +8,11 @@ export default class ReservaModelResponse {
 
     constructor(private readonly db: IDatabase | null,
         readonly id: UUID,
-        private readonly user_id: UUID,
+        readonly user_id: UUID,
         readonly parking_space_id: string,
-        private readonly vehicle_id: string) {
+        private readonly vehicle_id: string,
+        readonly created_at: Date,
+        readonly updated_at: Date) {
         (async (): Promise<void> => {
             await this.getVehicle()
         })().catch((error) => {

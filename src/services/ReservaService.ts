@@ -9,6 +9,62 @@ import ParkingModelError from '../models/Errors/ParkingModelError'
 import ReservaParkingSpaceCreate from '../models/Reservas/ReservaParkingSpaceCreate'
 
 class ReservaService {
+  async updateReserva(reservaId: string, vehiculo: VehiculoModel, startDate: FechaModel, endDate: FechaModel) {
+    // Step 1: Check if the reservation exists
+    const existingReserva = await ReservaModel.getReservaById(this.db, reservaId);
+    if (!existingReserva) {
+      throw new ParkingModelError('No se encontró la reserva con el ID proporcionado');
+    }
+
+    // Step 2: Validate vehicle and date details
+    if (!vehiculo.isValid) {
+      throw new ParkingModelError('Datos del vehículo no válidos');
+    } else if (!startDate.isValid || !endDate.isValid) {
+      throw new ParkingModelError('Datos de fecha no válidos');
+    } else if (startDate.fecha >= endDate.fecha) {
+      throw new ParkingModelError('La fecha de inicio debe ser anterior a la de terminación');
+    }
+
+    // Step 3: Prepare the updated reservation
+
+    const updatedReserva = new ReservaModel(
+      reservaId,
+      existingReserva.user_id,
+      existingReserva.parking_space_id,
+      vehiculo,
+      startDate,
+      endDate,
+      existingReserva.created_at,
+      new Date() // Assuming you want to update the modified date
+    );
+
+    // Step 4: Update the reservation in the database
+    const result = await ReservaModel.updateReserva(this.db, updatedReserva); // Assuming this method exists
+
+    if (result.affectedRows === 0) {
+      throw new ParkingModelError('No se pudo actualizar la reserva');
+    }
+
+    LoggerController.sendLog({
+      ...defaultEntryLog,
+      message: "Reserva actualizada exitosamente",
+      action: "Actualizar Reserva",
+      resource: "reserva",
+      details: {
+        userId: existingReserva.user_id,
+        reservationId: reservaId,
+        action: "Actualizar Reserva",
+        description: "Se actualizó la reserva con éxito"
+      }
+    });
+
+    return {
+      success: true,
+      message: 'Reserva actualizada con éxito',
+      detalles: updatedReserva.toJSON()
+    };
+  }
+
   constructor(private readonly db: IDatabase) { }
 
   async reservarPlaza(

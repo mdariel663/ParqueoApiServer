@@ -4,6 +4,7 @@ import { onlyAuthenticatedAccess } from '../controllers/controllers';
 const router = Router()
 router.post('/', onlyAuthenticatedAccess, ReservaController.createReserva);
 router.get('/', onlyAuthenticatedAccess, ReservaController.getReservas);
+router.put('/:reservationId', onlyAuthenticatedAccess, ReservaController.updateReserva);
 router.delete('/:reservationId', onlyAuthenticatedAccess, ReservaController.deleteReserva);
 
 export default router
