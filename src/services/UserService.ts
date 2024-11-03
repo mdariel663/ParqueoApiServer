@@ -10,7 +10,7 @@ import User from "../models/User/UserInterface";
 import UserResponse, { UserLoginResponse } from "../models/User/UserResponse";
 import UserLogged from "../models/User/UserInterface";
 import LoggerController, { defaultEntryLog } from "../controllers/LoggerController";
-import UserModelError from "../models/Errors/UserModelError";
+import UserModelError, { UserModelErrorAuth } from "../models/Errors/UserModelError";
 
 class UserService {
   static async deleteUser(currentUserId: UUID, userDeleteId: UUID | undefined): Promise<{ success: boolean; message: string; userId: UUID }> {
@@ -239,7 +239,7 @@ class UserService {
         emailRequest ?? phoneRequest,
         passwordRequest).then((user: UserResponse | null) => {
           if (user === null) {
-            throw new UserModelError(
+            throw new UserModelErrorAuth(
               "El usuario no existe o la contraseña es incorrecta"
             );
           }
@@ -272,7 +272,7 @@ class UserService {
               }
             })
           }
-          throw new UserModelError(
+          throw new UserModelErrorAuth(
             "El usuario no existe o la contraseña es incorrecta"
           );
         });
