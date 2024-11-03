@@ -34,6 +34,13 @@ describe('Logs Routes', () => {
   }, 10000)
 
   afterAll(async () => {
+    // Delete user
+    const deleteResponse = await request(server)
+      .delete(`/api/v2/user/${userId}`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(deleteResponse.status).toBe(200)
+
     await closeServer()
   }, 30000)
 
@@ -51,11 +58,5 @@ describe('Logs Routes', () => {
       expect(log.userId).toBeDefined()
     }
     expect(response.status).toBe(200)
-    // Delete user
-    const deleteResponse = await request(server)
-      .delete(`/api/v2/user/${userId}`)
-      .set('Authorization', `Bearer ${token}`)
-
-    expect(deleteResponse.status).toBe(200)
   })
 })
