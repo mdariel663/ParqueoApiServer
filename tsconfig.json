@@ -26,6 +26,6 @@
   "resolveJsonModule": true,
   "baseUrl": ".",
   "include": [
-    "src/**/*.ts"
-  ]
+    "src/**/*.ts", "__tests__/**/*"
+, "src/server_tests.ts"  ]
 }
