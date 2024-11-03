@@ -1,0 +1,114 @@
+[
+  {
+    "name": "Alice Smith",
+    "email": "alice.smith@example.com",
+    "phone": "+5323456780",
+    "password": "12Bx21@Afb",
+    "role": "admin"
+  },
+  {
+    "name": "David Wilson",
+    "email": "david.wilson@example.com",
+    "phone": "+5323456783",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Eva Green",
+    "email": "eva.green@example.com",
+    "phone": "+5323456784",
+    "password": "12Bx21@Afb",
+    "role": "admin"
+  },
+  {
+    "name": "Frank Harris",
+    "email": "frank.harris@example.com",
+    "phone": "+5323456785",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Grace Lee",
+    "email": "grace.lee@example.com",
+    "phone": "+5323456786",
+    "password": "12Bx21@Afb",
+    "role": "admin"
+  },
+  {
+    "name": "Henry Taylor",
+    "email": "henry.taylor@example.com",
+    "phone": "+5323456787",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Jack Thompson",
+    "email": "jack.thompson@example.com",
+    "phone": "+5323456789",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Liam Garcia",
+    "email": "liam.garcia@example.com",
+    "phone": "+5323456791",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Mia Rodriguez",
+    "email": "mia.rodriguez@example.com",
+    "phone": "+5323456792",
+    "password": "12Bx21@Afb",
+    "role": "admin"
+  },
+  {
+    "name": "Noah Martinez",
+    "email": "noah.martinez@example.com",
+    "phone": "+5323456793",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Olivia Hernandez",
+    "email": "olivia.hernandez@example.com",
+    "phone": "+5323456794",
+    "password": "12Bx21@Afb",
+    "role": "admin"
+  },
+  {
+    "name": "Paul Lewis",
+    "email": "paul.lewis@example.com",
+    "phone": "+5323456795",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Quinn Walker",
+    "email": "quinn.walker@example.com",
+    "phone": "+5323456796",
+    "password": "12Bx21@Afb",
+    "role": "admin"
+  },
+  {
+    "name": "Rita Hall",
+    "email": "rita.hall@example.com",
+    "phone": "+5323456797",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  },
+  {
+    "name": "Steve Allen",
+    "email": "steve.allen@example.com",
+    "phone": "+5323456798",
+    "password": "12Bx21@Afb",
+    "role": "admin"
+  },
+  {
+    "name": "Tina Young",
+    "email": "tina.young@example.com",
+    "phone": "+5323456799",
+    "password": "12Bx21@Afb",
+    "role": "cliente"
+  }
+]
