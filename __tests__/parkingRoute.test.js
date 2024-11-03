@@ -42,10 +42,15 @@ export default describe('Parking API Endpoints', () => {
   }, 10000)
 
   afterAll(async () => {
+    // Eliminar usuario
+    await request(server)
+      .delete('/api/v2/user')
+      .set('Authorization', `Bearer ${token}`)
+
     await closeServer()
   }, 30000)
   // Test para crear una plaza
-  it(`POST /api/v2/parking/${parkingSpaceOriginal} - Creando una plaza de parqueo`, async () => {
+  test(`POST /api/v2/parking/${parkingSpaceOriginal} - Creando una plaza de parqueo`, async () => {
     const response = await request(server)
       .post(`/api/v2/parking/${parkingSpaceOriginal}`)
       .set('Authorization', `Bearer ${token}`)
@@ -58,7 +63,7 @@ export default describe('Parking API Endpoints', () => {
     )
   })
   // Test para actualizar una plaza
-  it(`PUT /api/v2/parking/${parkingSpaceOriginal} - Actualizando una plaza de parqueo`, async () => {
+  test(`PUT /api/v2/parking/${parkingSpaceOriginal} - Actualizando una plaza de parqueo`, async () => {
     const response = await request(server)
       .put(`/api/v2/parking/${parkingSpaceOriginal}`)
       .set('Authorization', `Bearer ${token}`)
@@ -76,7 +81,7 @@ export default describe('Parking API Endpoints', () => {
   })
 
   // Test para obtener todas las plazas de aparcamiento
-  it('GET /api/v2/parking - devuelve todas las plazas de aparcamiento', async () => {
+  test('GET /api/v2/parking - devuelve todas las plazas de aparcamiento', async () => {
     const response = await request(server)
       .get('/api/v2/parking')
       .set('Authorization', `Bearer ${token}`)
@@ -87,7 +92,7 @@ export default describe('Parking API Endpoints', () => {
   })
 
   // Test para obtener una plaza por ID
-  it(`GET /api/v2/parking/${parkingSpaceUpdated} - Deberia devolver una plaza de parqueo`, async () => {
+  test(`GET /api/v2/parking/${parkingSpaceUpdated} - Deberia devolver una plaza de parqueo`, async () => {
     const response = await request(server)
       .get(`/api/v2/parking/${parkingSpaceUpdated}`)
       .set('Authorization', `Bearer ${token}`)
@@ -98,7 +103,7 @@ export default describe('Parking API Endpoints', () => {
   })
 
   // Test para eliminar una plaza
-  it(`DELETE /api/v2/parking/${parkingSpaceUpdated} - Elimina una plaza de parqueo`, async () => {
+  test(`DELETE /api/v2/parking/${parkingSpaceUpdated} - Elimina una plaza de parqueo`, async () => {
     const response = await request(server)
       .delete(`/api/v2/parking/${parkingSpaceUpdated}`)
       .set('Authorization', `Bearer ${token}`)
@@ -109,10 +114,5 @@ export default describe('Parking API Endpoints', () => {
       'message',
       'Plaza de aparcamiento eliminada exitosamente',
     )
-
-    // Eliminar usuario
-    await request(server)
-      .delete('/api/v2/user')
-      .set('Authorization', `Bearer ${token}`)
   })
 })
