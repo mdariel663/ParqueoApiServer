@@ -1,0 +1,1119 @@
+{
+	"info": {
+		"_postman_id": "ceec018e-9455-4434-bf70-b4962e8a24a1",
+		"name": "Parking Management API v2",
+		"description": "Pruebas de la API de gestión de aparcamientos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "38973644"
+	},
+	"item": [
+		{
+			"name": "Usuarios",
+			"item": [
+				{
+					"name": "Listar Usuarios",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifies that the response has a status of 200",
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Verifies that the response is an array of at least one user",
+									"pm.test(\"Response is an array of at least one user\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array').that.is.not.empty; // Checks if the array is not empty",
+									"",
+									"    jsonData.forEach(user => {",
+									"        pm.expect(user).to.be.an('object'); // Checks if each element is an object",
+									"        pm.expect(user).to.have.property(\"id\");",
+									"        pm.expect(user).to.have.property(\"name\"); // Checks if each user has a 'name' property",
+									"        pm.expect(user).to.have.property(\"email\"); // Checks if each user has an 'email' property",
+									"        pm.expect(user).to.have.property(\"role\"); // Checks if each user has a 'role' property",
+									"        pm.expect(user).to.have.property(\"created_at\"); // Checks if each user has a 'created_at' property",
+									"        pm.expect(user).to.have.property(\"updated_at\"); // Checks if each user has an 'updated_at' property",
+									"    });",
+									"});",
+									"",
+									"// Verifies that the response time is within 300ms",
+									"pm.test(\"Response time is within 300ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
+									"});",
+									"",
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response time is within acceptable range\", function () {",
+									"  pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Each user has the required fields - name, email, role, created_at, and updated_at\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    responseData.forEach(function(user) {",
+									"        pm.expect(user).to.have.property('name').that.is.a('string');",
+									"        pm.expect(user).to.have.property('email').that.is.a('string');",
+									"        pm.expect(user).to.have.property('role').that.is.a('string');",
+									"        pm.expect(user).to.have.property('created_at').that.is.a('string');",
+									"        pm.expect(user).to.have.property('updated_at').that.is.a('string');",
+									"    });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Email for each user is in a valid email format\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    responseData.forEach(function(user) {",
+									"        pm.expect(user.email).to.be.a('string').and.to.match(/^.+@.+\\..+$/);",
+									"    });",
+									"});",
+									"",
+									"",
+									"pm.test(\"Role for each user is a non-empty string\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('array');",
+									"    responseData.forEach(function(user) {",
+									"        pm.expect(user.role).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Role should not be empty\");",
+									"    });",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{base_url}}/api/v2/user/list",
+						"description": "Retorna la lista de todos los usuarios solamente al usuario administrativo : {{base_url}}/api/v2/user/list.\n\n### Response\n\nThe response will be a JSON array containing user objects with the following properties:\n\n- `name` (string): El nombre del usuario.\n    \n- `email` (string): El correo del usuario.\n    \n- `role` (string): El rol del usuario.\n    \n- `created_at` (string): El tiempo \"timestamp\" que indica donde la informacion del usuario se crea.\n    \n- `updated_at` (string): El tiempo \"timestamp\" que indica donde la informacion del usuario se modifica.\n    \n\n#### JSON Schema\n\n``` json\n{\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"name\": { \"type\": \"string\" },\n      \"email\": { \"type\": \"string\" },\n      \"role\": { \"type\": \"string\" },\n      \"created_at\": { \"type\": \"string\" },\n      \"updated_at\": { \"type\": \"string\" }\n    }\n  }\n}\n\n ```"
+					},
+					"response": [
+						{
+							"name": "Listar Usuarios",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": "{{base_url}}/api/v2/user/list"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "783"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"30f-C5io5heRCYy3qFR4rXb7jkOiwvw\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 25 Oct 2024 06:20:05 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"ddd558e9-9708-498c-8da1-8d3bb81af6da\",\n        \"name\": \"Felipe Novoa\",\n        \"email\": \"felipe123@gmail.com\",\n        \"role\": \"admin\",\n        \"created_at\": \"2024-10-25T05:09:01.000Z\",\n        \"updated_at\": \"2024-10-25T05:44:28.000Z\"\n    },\n    {\n        \"id\": \"6430ff28-1386-47df-9646-2c57334b6577\",\n        \"name\": \"Analis Rumanir\",\n        \"email\": \"1rumain123@gmail.com\",\n        \"role\": \"admin\",\n        \"created_at\": \"2024-10-25T06:04:55.000Z\",\n        \"updated_at\": \"2024-10-25T06:04:55.000Z\"\n    },\n    {\n        \"id\": \"8334beee-fccf-4ead-871d-3d4f2fb079f1\",\n        \"name\": \"A1nalis Rumanir\",\n        \"email\": \"2rumain123@gmail.com\",\n        \"role\": \"admin\",\n        \"created_at\": \"2024-10-25T06:05:58.000Z\",\n        \"updated_at\": \"2024-10-25T06:05:58.000Z\"\n    },\n    {\n        \"id\": \"0a30e1a1-7315-4ecb-9f52-65aba6fc3c5c\",\n        \"name\": \"Analis Rumanir\",\n        \"email\": \"xrumain123@gmail.com\",\n        \"role\": \"admin\",\n        \"created_at\": \"2024-10-25T06:10:37.000Z\",\n        \"updated_at\": \"2024-10-25T06:10:37.000Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Obtener Usuario Actual",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estado 200 - Éxito con autenticación\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"name\");",
+									"  pm.expect(jsonData).to.have.property(\"email\");",
+									"  pm.expect(jsonData).to.have.property(\"role\");",
+									"  pm.expect(jsonData).to.have.property(\"created_at\");",
+									"  pm.expect(jsonData).to.have.property(\"updated_at\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/v2/user",
+						"description": "\n## GET / - Obtener Usuario Actual\n\n###### Descripción:\n\nRecupera los datos del usuario autenticado.\n\n###### Headers:\n\nAuthorization: Bearer <token>\n\n###### Respuesta Exitosa:\n\nCódigo: 200 OK \\| Ejemplo de Respuesta:\n\n```json\n{\n  \"success\": true,\n  \"name\": \"string\",\n  \"email\": \"string\",\n  \"phone\": \"string\",\n  \"role\": \"string\",\n  \"created_at\": \"string\", // formato ISO 8601: EJ: \"2023-10-01T12:00:00Z\"\n  \"updated_at\": \"string\" // formato ISO 8601: EJ: \"2023-10-01T12:00:00Z\"\n}\n```\n\n###### Respuesta Fallida:\n\n- Las respuestas generales.\n\nCodigo: **401 Unauthorized** \\| Ejemplo de Respuesta: \\| Código:\n\n```json\n{\n  \"success\": boolean(false),\n  \"message\": \"Usuario no autenticado\"\n}\n```\n\n**400 Bad Request** \\| Ejemplo de Respuesta: \\| Código:\n\n```json\n{\n  \"success\": boolean(false),\n  \"message\": \"Datos JSON mal estructurados\"\n}\n```\n\n**500 Internal Server Error** \\| Ejemplo de Respuesta: \\| Código:\n\n```json\n{\n  \"success\": boolean(false),\n  \"message\": \"Error al obtener el usuario.\"\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Obtener Usuario Actual",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/api/v2/user"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "185"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"b9-FVI9GjcQ1vOI3lsZJUwKne9n0K0\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 25 Oct 2024 06:19:11 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"name\": \"Felipe Novoa\",\n    \"email\": \"felipe123@gmail.com\",\n    \"phone\": \"+5312345678\",\n    \"role\": \"admin\",\n    \"created_at\": \"2024-10-25T05:09:01.000Z\",\n    \"updated_at\": \"2024-10-25T05:44:28.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Actualizar Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Respuesta OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Respuesta confirma actualización\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message', 'Usuario actualizado con éxito');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n    //Opcional: \"userId\": \"99ee96e6-08db-49cf-a86c-85dc9a5b4ff1\", //. Para actualizar la informacion de algun cliente o empleado.\n    \"name\": \"Felipe Novoa\", \n    \"email\": \"felipe123@gmail.com\",\n    \"phone\": \"+5312345678\"\n    // Opcional: , \"role\": \"admin\" // . Solo el administrador puede modificar esta propiedad\n}"
+						},
+						"url": "{{base_url}}/api/v2/user",
+						"description": "\n## PUT / - Actualizar Usuario\n\n##### Descripción:\n\nActualiza los datos del usuario autenticado.\n\n##### Headers:\n\nAuthorization: Bearer <token>\n\n#### Consideraciones:\n\n- El usuario tiene que ser administrador para acceder a esta ruta o el usuario tiene que ser el mismo que el actual.\n\n##### Parametros:\n\n- **userId** (opcional y solo puede ser actualizado por el usuario administrador): Id del usuario.\n- **name** (opcional): Nombre del usuario.\n- **email** (opcional): Email del usuario.\n- **phone** (opcional): Numero de telefono del usuario.\n- **password** (opcional): Contraseña del usuario.\n- **role** (opcional, solo puede ser actualizado por el usuario administrador): Rol del usuario.\n  // TODO: verificar si un email es valido pero el phone no lo es\n\n##### Solicitud\n\n```json\n{\n  \"name\": \"string\",\n  \"email\": \"string\",\n  \"phone\": \"string\",\n  \"password\": \"string\",\n  \"role\": \"string\" // opcional, solo puede ser actualizado por el usuario administrador\n}\n```\n\n###### Respuesta exitosa:\n\nCódigo: **200 OK** \\| Ejemplo de Respuesta:\n\n```json\n{\n  \"message\": \"Usuario actualizado con éxito\",\n  \"success\": true,\n  \"name\": \"string\",\n  \"email\": \"string\",\n  \"phone\": \"string\",\n  \"role\": \"string\",\n  \"created_at\": \"string\", // formato ISO 8601: EJ: \"2023-10-01T12:00:00Z\"\n  \"updated_at\": \"string\" // formato ISO 8601: EJ: \"2023-10-01T12:00:00Z\"\n}\n```\n\n###### Respuesta Fallida:\n\n- Las respuestas generales de errores.\n- Las respuestas por errores de formato de datos.\n\nCodigo: **401 Unauthorized** \\| Ejemplo de Respuesta: \\| Código:\n\n```json\n{\n  \"success\": boolean(false),\n  \"message\": \"Usuario no autenticado\"\n}\n```\n\n**400 Bad Request** \\| Ejemplo de Respuesta: \\| Código:\n\n```json\n{\n  \"success\": boolean(false),\n  \"message\": \"Datos JSON mal estructurados\"\n}\n```\n\n**400 Bad Request** \\| Ejemplo de Respuesta: \\| Código:\n\n```json\n{\n  \"message\": \"El usuario ya existe\",\n  \"success\": false\n}\n```\n\n**500 Internal Server Error** \\| Ejemplo de Respuesta: \\| Código:\n\n```json\n{\n  \"success\": boolean(false),\n  \"message\": \"Error al obtener el usuario.\"\n}\n```\n"
+					},
+					"response": [
+						{
+							"name": "Actualizar Usuario",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \n    //Opcional: \"userId\": \"\"\n    \"name\": \"Felipe Novoa\", \n    \"email\": \"felipe123@gmail.com\",\n    \"phone\": \"+5312345678\",\n    \"role\": \"admin\"\n}"
+								},
+								"url": "{{base_url}}/api/v2/user"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "148"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"94-RA7j2iyN7jFEdidNoPdMN82ohOM\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 25 Oct 2024 06:17:00 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Usuario actualizado con éxito\",\n    \"name\": \"Felipe Novoa\",\n    \"email\": \"felipe123@gmail.com\",\n    \"phone\": \"+5312345678\",\n    \"role\": \"admin\",\n    \"success\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Crear Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 500ms\", function () {",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields - error and success\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.user).to.exist;",
+									"    pm.expect(responseData.success).to.exist;",
+									"});",
+									"",
+									"",
+									"",
+									"pm.test(\"Success is a boolean value\", function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData.success).to.be.a('boolean');",
+									"});",
+									"",
+									"pm.test(\"Response has the Content-Type header set to 'application/json'\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \"name\": \"Charles Tompsons\",\n    \"email\": \"charles123@gmail.com\",\n    \"password\": \"12Bx21@Afb\",\n    \"phone\": \"+5312345678\",\n    \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/v2/user",
+						"description": "Sirve para crear un nuevo usuario {{base_url}}/api/v2/user.\n\n### Request Body\n\n- name (string, required): El nombre del usuario.\n    \n- email (string, required): El email del usuario.\n    \n- password (string, required): La password del usuario.\n    \n- role (string, required): El rol son solo 3 disponibles (**empleado, cliente, admin**).\n    \n\n### Respuesta\n\nEste es el esquema JSON de la respuesta:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"error\": {\n      \"type\": \"string\"\n    },\n    \"success\": {\n      \"type\": \"boolean\"\n    }\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Autenticar Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Response time is less than 500ms\", function () {",
+									"  pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has the required fields - error and success\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.success).to.exist;",
+									"    pm.expect(responseData.token).to.exist;",
+									"    pm.environment.set(\"jwt_token\", responseData.token);  // Quita la necesidad de setear token manualmente",
+									"    });",
+									"",
+									"",
+									"pm.test(\"Success is a boolean value\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData.success).to.be.a('boolean');",
+									"});",
+									"",
+									"pm.test(\"Response has the Content-Type header set to 'application/json'\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n    \"email\":  \"charles123@gmail.com\",  \n    \"password\": \"12Bx21@Afb\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/v2/user/login",
+						"description": "### Inicio de sesión de usuario\n\nEste endpoint permite a los usuarios iniciar sesión proporcionando su correo electrónico y contraseña.\n\n#### Cuerpo de la solicitud\n\n- `email` (cadena): la dirección de correo electrónico del usuario.\n    \n- `password` (cadena): la contraseña de la cuenta del usuario.\n    \n\n#### Respuesta\n\nTras iniciar sesión correctamente, la respuesta incluirá:\n\n- `success` (booleano): indica si el inicio de sesión fue exitoso.\n    \n- `message` (cadena): un mensaje relacionado con el estado de inicio de sesión.\n    \n- `id` (cadena): el ID del usuario.\n    \n- `token` (cadena): un token para acceder a recursos protegidos.\n    \n\nEjemplo:\n\n``` json\n{\n\"success\": true,\n\"message\": \"\",\n\"id\": \"\",\n\"token\": \"\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Response time test with updated threshold",
+									"pm.test(\"Response time is less than 300ms\", function () {",
+									"  pm.expect(pm.response.responseTime).to.be.below(300);",
+									"});",
+									"",
+									"pm.test(\"Presence of error and success fields in response schema\", function () {",
+									"    const responseData = pm.response.json();",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.message).to.exist;",
+									"    pm.expect(responseData.success).to.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{base_url}}/api/v2/user/9c47aec8-1468-4259-98b7-912f2bcb3f42",
+						"description": "### DELETE /api/v2/user\n\n#### Solicitud: Body\n\n- `userId` (string, required): El identificador unico (UUID) del usuario a eliminar\n    \n\nExample:\n\n``` json\n{\n    \"userId\": \"4a7d5f94-89d2-11ef-9f1a-c4e984 ...\"\n}\n\n ```\n\n#### Respuesta\n\n- Status: 500\n    \n- Content-Type: application/json\n    \n\nExample Response Body:\n\n``` json\n{\n    \"error\": \"\",\n    \"success\": true\n}\n\n ```"
+					},
+					"response": []
+				}
+			],
+			"description": "Aqui estan todos los endpoints relacionados con los usuarios",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Parking",
+			"item": [
+				{
+					"name": "Reservaciones",
+					"item": [
+						{
+							"name": "Reservar Parking",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response has the required fields - success, message, detalles\", function () {",
+											"    const responseData = pm.response.json();",
+											"",
+											"    pm.expect(responseData).to.have.property('success');",
+											"    pm.expect(responseData).to.have.property('message');",
+											"    pm.expect(responseData).to.have.property('detalles');",
+											"});",
+											"",
+											"",
+											"pm.test(\"Vehiculo object contains make, model, and plate\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.detalles.vehiculo.make).to.exist;",
+											"    pm.expect(responseData.detalles.vehiculo.model).to.exist;",
+											"    pm.expect(responseData.detalles.vehiculo.plate).to.exist;",
+											"});",
+											"",
+											"",
+											"",
+											"pm.test(\"Verify the presence and format of created_at and updated_at fields\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.detalles.created_at).to.be.a('string', \"created_at should be a string\");",
+											"    pm.expect(responseData.detalles.updated_at).to.be.a('string', \"updated_at should be a string\");",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response time is within 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});",
+											"// Add a test to validate the response schema",
+											"pm.test(\"Response schema is valid\", function () {",
+											"  var schema = {",
+											"    type: \"object\",",
+											"    properties: {",
+											"      success: { type: \"boolean\" },",
+											"      message: { type: \"string\" },",
+											"      detalles: {",
+											"        type: \"object\",",
+											"        properties: {",
+											"          id: { type: \"string\" },",
+											"          user_id: { type: \"string\" },",
+											"          parking_space_id: { type: \"string\" },",
+											"          vehiculo: {",
+											"            type: \"object\",",
+											"            properties: {",
+											"              make: { type: \"string\" },",
+											"              model: { type: \"string\" },",
+											"              plate: { type: \"string\" }",
+											"            },",
+											"            required: [\"make\", \"model\", \"plate\"]",
+											"          },",
+											"          start_time: {",
+											"            type: \"object\",",
+											"            properties: {",
+											"              isValid: { type: \"boolean\" },",
+											"              fecha: { type: \"string\" }",
+											"            }",
+											"          },",
+											"          end_time: {",
+											"            type: \"object\",",
+											"            properties: {",
+											"              isValid: { type: \"boolean\" },",
+											"              fecha: { type: \"string\" }",
+											"            }",
+											"          },",
+											"          created_at: { type: \"string\" },",
+											"          updated_at: { type: \"string\" }",
+											"        },",
+											"        required: [\"id\", \"user_id\", \"parking_space_id\", \"vehiculo\", \"start_time\", \"end_time\", \"created_at\", \"updated_at\"]",
+											"      }",
+											"    },",
+											"    required: [\"success\", \"message\", \"detalles\"]",
+											"  };",
+											"",
+											"  var response = pm.response.json();",
+											"  pm.expect(tv4.validate(response, schema)).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  // Opcional:  \"userId\": \"c646bb45-0a8d-49ce-aef4-646aeb7c1b12\",\n  \"vehicleDetails\": {\n    \"make\": \"Ferrari\",\n    \"model\": \"Corbet\",\n    \"plate\": \"123456X\"\n  },\n  //Opcional:   \"parkingSpaceId\" : \"space-1730195611080-503\",\n\"startTime\": \"2024-12-04 11:00:00\",\n \"endTime\": \"2025-12-01 12:00:00\"\n}\n\n  //  mes/dia/ano espacio hora:minuto\n"
+								},
+								"url": "{{base_url}}/api/v2/reservas",
+								"description": "El endpoint de la API `POST {{base_url}}/api/v2/reservas` se utiliza para crear una nueva reserva. La solicitud debe enviarse como una solicitud HTTP POST con una carga útil JSON en el cuerpo de la solicitud. La carga útil debe incluir los siguientes parámetros:\n\n- `userId` (opcional): una cadena que representa el identificador único del usuario que realiza la reserva.\n\n- `vehicleDetails`: un objeto que contiene detalles sobre el vehículo que se reserva, incluida la marca, el modelo y la matrícula.\n\n- `parkingSpaceId` (opcional): una cadena que representa el identificador único del espacio de estacionamiento donde se estacionará el vehículo.\n\n- `startTime`: una cadena que representa la hora de inicio de la reserva en el formato \"AAAA-MM-DD HH:MM:SS\".\n\n- `endTime`: una cadena que representa la hora de finalización de la reserva en el formato \"AAAA-MM-DD HH:MM:SS\".\n\nLa respuesta de esta solicitud será un objeto JSON que representa la reserva creada. Para documentar la respuesta como un esquema JSON, la definición del esquema deberá incluir las propiedades y los tipos de datos del objeto de respuesta, según la respuesta real recibida de la API.\n\nPor ejemplo, el esquema JSON para la respuesta puede incluir propiedades como `reservationId`, `userId`, `vehicleDetails`, `parkingSpaceId`, `startTime` y `endTime`, junto con sus respectivos tipos de datos."
+							},
+							"response": []
+						},
+						{
+							"name": "Cancelar reservacion",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response time is less than 200ms\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response has the required fields - success and message\", function () {",
+											"  const responseData = pm.response.json();",
+											"  ",
+											"  pm.expect(responseData).to.be.an('object');",
+											"  pm.expect(responseData.success).to.exist;",
+											"  pm.expect(responseData.message).to.exist;",
+											"});",
+											"pm.test(\"Response schema is valid\", function () {",
+											"  var schema = {",
+											"    type: \"object\",",
+											"    properties: {",
+											"      success: {",
+											"        type: \"boolean\"",
+											"      },",
+											"      message: {",
+											"        type: \"string\"",
+											"      }",
+											"    },",
+											"    required: [\"success\", \"message\"],",
+											"  };",
+											"",
+											"  var response = pm.response.json();",
+											"  pm.expect(tv4.validate(response, schema)).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": "{{base_url}}/api/v2/reservas/9f537169-2477-4553-87c7-2f73bd5c56da",
+								"description": "El endpoint de la API envía una solicitud HTTP DELETE para eliminar una reserva específica identificada por el ID proporcionado. Tras una ejecución exitosa, la API devuelve una respuesta JSON con un código de estado de 200 y un tipo de contenido de aplicación/json. El cuerpo de la respuesta contiene un esquema JSON con la siguiente estructura:\n\n``` json\n{\n\"type\": \"object\",\n\"properties\": {\n\"success\": {\n\"type\": \"boolean\"\n},\n\"message\": {\n\"type\": \"string\"\n}\n},\n\"required\": [\"success\", \"message\"]\n}\n\n```"
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener Reservaciones",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"  pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response time is within an acceptable range\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Content-Type header is application/json\", function () {",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response has the required fields\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.details).to.be.an('array');",
+											"    ",
+											"    responseData.details.forEach(function(detail) {",
+											"        pm.expect(detail).to.have.property('id');",
+											"        pm.expect(detail).to.have.property('user_id');",
+											"        pm.expect(detail).to.have.property('parking_space_id');",
+											"        pm.expect(detail).to.have.property('vehicle_id');",
+											"        pm.expect(detail).to.have.property('start_time');",
+											"        pm.expect(detail).to.have.property('end_time');",
+											"        pm.expect(detail).to.have.property('created_at');",
+											"        pm.expect(detail).to.have.property('updated_at');",
+											"    });",
+											"});",
+											"// Add a test to check for response schema validation",
+											"pm.test(\"Response has a valid schema\", function () {",
+											"  var schema = {",
+											"    type: \"object\",",
+											"    properties: {",
+											"      success: { type: \"boolean\" },",
+											"      message: { type: \"string\" },",
+											"      details: {",
+											"        type: \"array\",",
+											"        items: {",
+											"          type: \"object\",",
+											"          properties: {",
+											"            id: { type: \"string\" },",
+											"            user_id: { type: \"string\" },",
+											"            parking_space_id: { type: \"string\" },",
+											"            vehicle_id: { type: \"string\" },",
+											"            start_time: { type: \"string\" },",
+											"            end_time: { type: \"string\" },",
+											"            created_at: { type: \"string\" },",
+											"            updated_at: { type: \"string\" }",
+											"          },",
+											"          required: [\"id\", \"user_id\", \"parking_space_id\", \"vehicle_id\", \"start_time\", \"end_time\", \"created_at\", \"updated_at\"]",
+											"        }",
+											"      }",
+											"    },",
+											"    required: [\"success\", \"details\"]",
+											"  };",
+											"",
+											"  var response = pm.response.json();",
+											"  pm.expect(tv4.validate(response, schema)).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/api/v2/reservas",
+								"description": "### Description: Obtener Reservas\n\nReservar Plaza de Aparcamiento  \n\n#### Autenticación:\n\nRequiere que el usuario esté autenticado mediante el token en el header de tipo \"Bearer\" y que tenga el rol administrador o empleado.\n\n#### Headers:\n\nAuthorization: Bearer {token}\n\n#### Respuestas Posibles\n\n``` json\n{\n  \"success\": true,\n  \"message\": \"Reservas obtenidas exitosamente\",\n  \"details\": [\n    {\n      \"id\": \"string\",\n      \"user_id\": \"string\",\n      \"parking_space_id\": \"string\",\n      \"vehiculo\": {\n        \"make\": \"string\",\n        \"model\": \"string\",\n        \"plate\": \"string\"\n      },\n      \"start_time\": \"YYYY-MM-DDTHH:mm:ss\",\n      \"end_time\": \"YYYY-MM-DDTHH:mm:ss\",\n      \"created_at\": \"YYYY-MM-DDTHH:mm:ss\",\n      \"updated_at\": \"YYYY-MM-DDTHH:mm:ss\"\n    }...\n  ]\n}\n\n ```\n\n#### Respuestas Generales:\n\n##### Respuesta Fallida:\n\nCódigo: **401 Unauthorized** | Ejemplo de Respuesta:\n\n``` json\n{\n  \"success\": boolean(false),\n  \"message\": \"Usuario no autenticado\"\n}\n\n ```\n\n###### Respuesta Fallida:\n\nCódigo: **500 Internal Server Error** | Ejemplo de Respuesta:\n\n``` json\n{\n  \"success\": boolean(false),\n  \"message\": \"Error al obtener las reservas\"\n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar Reservaciones",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n    \"vehiculo\": {\n        \"make\": \"EstuartNew\",\n        \"model\": \"Azure\",\n        \"plate\": \"598-987-154\"\n    },\n            \"startTime\": \"2025-01-04 11:00:00\",\n        \"endTime\": \"2026-12-04 11:00:00\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/v2/reservas/78825893-6fce-44f2-91b0-35374c43d22a",
+								"description": "### Description:\n\nActualizar Reserva\n\n##### Autenticación:\n\nRequiere que el usuario esté autenticado mediante el token en el header de tipo \"Bearer\" y que tenga el rol administrador o empleado.\n\n##### Headers:\n\nAuthorization: Bearer {token}\n\n#### Solicitud\n\n``` json\n{\n  \"vehiculo\": {\n    \"make\": \"string\",\n    \"model\": \"string\",\n    \"plate\": \"string\"\n  },\n  \"start_time\": \"YYYY-MM-DDTHH:mm:ss\", // formato ISO 8601: EJ: \"2023-10-01T12:00:00Z\"\n  \"end_time\": \"YYYY-MM-DDTHH:mm:ss\" // formato ISO 8601: EJ: \"2023-10-01T12:00:00Z\"\n}\n\n ```\n\n#### Respuesta Exitosa:\n\nCódigo: **200 OK** | Ejemplo de Respuesta:\n\n``` json\n{\n  \"success\": true,\n  \"message\": \"Reserva actualizada con éxito\",\n  \"details\": {\n    \"id\": \"string\",\n    \"user_id\": \"string\",\n    \"parking_space_id\": \"string\",\n    \"vehicle_id\": \"string\",\n    \"start_time\": \"YYYY-MM-DDTHH:mm:ss\",\n    \"end_time\": \"YYYY-MM-DDTHH:mm:ss\",\n    \"created_at\": \"YYYY-MM-DDTHH:mm:ss\",\n    \"updated_at\": \"YYYY-MM-DDTHH:mm:ss\"\n  }\n}\n\n ```\n\n#### Respuestas Generales:\n\n##### Respuesta Fallida:\n\nCódigo: **401 Unauthorized** | Ejemplo de Respuesta:\n\n``` json\n{\n  \"success\": boolean(false),\n  \"message\": \"Usuario no autenticado\"\n}\n\n ```\n\n###### Respuesta Fallida:\n\nCódigo: **400 Bad Request** | Ejemplo de Respuesta:\n\n``` json\n{\n  \"success\": boolean(false),\n  \"message\": \"Datos JSON mal estructurados\"\n}\n\n ```\n\nCódigo: **500 Internal Server Error** | Ejemplo de Respuesta:\n\n``` json\n{\n  \"success\": boolean(false),\n  \"message\": \"Error al procesar la reserva\"\n}\n\n ```\n\nCódigo: **500 Internal Server Error** | Ejemplo de Respuesta: | Código:\n\n``` json\n{\n  \"success\": boolean(false),\n  \"message\": \"No se puede reservar una plaza de aparcamiento que no existe\"\n}\n\n ```\n\nCódigo: **400 Bad Request** | Ejemplo de Respuesta: | Código:\n\n``` json\n{\n  \"message\": \"No hay plazas disponibles en el horario solicitado\",\n  \"success\": boolean(false)\n}\n\n ```\n\nCódigo: **400 Bad Request** | Ejemplo de Respuesta: | Código:\n\n``` json\n{\n  \"success\": false,\n  \"message\": \"Datos del vehículo no válidos\"\n}\n\n ```\n\nCódigo: **401 Unauthorized** | Ejemplo de Respuesta: | Código:\n\n``` json\n{\n  \"success\": false,\n  \"message\": \"Usuario no autenticado\"\n}\n\n ```"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Espacio de Parqueo",
+					"item": [
+						{
+							"name": "Obtener Datos de un Parking",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/api/v2/parking/minihacker123",
+								"description": "### **Obtener Todos los Espacios de Estacionamiento**\n\n**Método:** `GET`  \n**URL:** `/api/parking`  \n**Authorization:** Bearer\n\n#### Respuesta Exitosa\n\n``` json\n{\n    \"success\": true,\n    \"parkingSpaces\": [\n        {\n            \"parking_space_id\": \"string\",\n            \"is_available\": true,\n            \"reservations_count\": 0\n        }\n    ],\n    \"message\": \"Plazas de aparcamiento obtenidas exitosamente\"\n}\n\n ```\n\n#### Respuesta de Error\n\n``` json\n{\n    \"success\": false,\n    \"message\": \"No se pudo obtener las plazas de aparcamiento\"\n}\n\n ```\n\n### 2\\. Obtener Espacio de Estacionamiento por ID\n\n- **Método:** `GET`\n    \n\n- **URL:** `/api/parking/:spaceId`\n    \n\n- Authorization: Bearer\n    \n\n#### Parámetros\n\n- `spaceId`: ID del espacio de estacionamiento que se desea obtener.\n    \n\n#### Respuesta Exitosa\n\n``` json\n{\n    \"success\": true,\n    \"message\": \"Reserva obtenida exitosamente\",\n    \"details\": {\n        \"parking_space_id\": \"string\",\n        \"is_available\": true,\n        \"reservations_count\": 0\n    }\n}\n\n ```\n\n#### Respuesta de Error\n\n``` json\n\"message\": \"No se puede obtener la reserva de la plaza\"  \n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener todos los Parkings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response has the required fields\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData).to.have.property('occupiedPlazas');",
+											"    pm.expect(responseData).to.have.property('availablePlazas');",
+											"    pm.expect(responseData).to.have.property('message');",
+											"});",
+											"",
+											"",
+											"pm.test(\"OccupiedPlazas array is present and contains expected number of elements\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.occupiedPlazas).to.exist;",
+											"    pm.expect(responseData.occupiedPlazas).to.be.an('array');",
+											"});",
+											"",
+											"",
+											"pm.test(\"Available plazas array is present and empty\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.availablePlazas).to.exist.and.to.be.an('array').that.is.empty;",
+											"});",
+											"",
+											"",
+											"pm.test(\"Occupied plazas have non-empty parking_space_id and vehicle_id\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData.occupiedPlazas).to.be.an('array').that.is.not.empty;",
+											"",
+											"    responseData.occupiedPlazas.forEach(function(plaza) {",
+											"        pm.expect(plaza.parking_space_id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"parking_space_id should not be empty\");",
+											"        pm.expect(plaza.vehicle_id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"vehicle_id should not be empty\");",
+											"    });",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": "{{base_url}}/api/v2/parking",
+								"description": "### Descripción de la solicitud GET\n\nEste endpoint realiza una solicitud HTTP GET para obtener los datos. La solicitud no requiere un cuerpo de solicitud y la respuesta contendrá los datos solicitados en formato JSON.\n\n### Cuerpo de la solicitud\n\nEsta solicitud no requiere un cuerpo de solicitud.\n\n### Respuesta\n\nLa respuesta estará en formato JSON y contendrá los datos solicitados. A continuación, se muestra un esquema JSON para la respuesta:\n\n``` json\n{\n    \"occupiedPlazas\": [\n        {\n            \"parking_space_id\": \"5871aINTMER\",\n            \"is_available\": 0,\n            \"vehicle_id\": \"123456X\",\n            \"make\": \"Ferrari\",\n            \"model\": \"Corbet\",\n            \"reservations_count\": 0\n        },\n        {\n            \"parking_space_id\": \"space-1730194839590-507\",\n            \"is_available\": 0,\n            \"vehicle_id\": \"123456X\",\n            \"make\": \"Ferrari\",\n            \"model\": \"Corbet\",\n            \"reservations_count\": 0\n        }\n    ],\n    \"availablePlazas\": [\n        {\n            \"parking_space_id\": \"space-1730450192336-238\",\n            \"is_available\": 1,\n            \"vehicle_id\": null,\n            \"make\": null,\n            \"model\": null,\n            \"reservations_count\": 0\n        }\n    ],\n    \"message\": \"Ocupación del parking obtenida exitosamente\"\n}\n\n ```"
+							},
+							"response": [
+								{
+									"name": "Consultar Ocupación del Parking",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": "{{base_url}}/api/v2/parking"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "178"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"b2-4MhQxKZLUEZzGpcYVquq/wrgMZA\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 25 Oct 2024 04:31:01 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"plazas\": [\n        {\n            \"id\": \"space-1\",\n            \"isAvailable\": true\n        },\n        {\n            \"id\": \"space-2\",\n            \"isAvailable\": true\n        },\n        {\n            \"id\": \"space-3\",\n            \"isAvailable\": false\n        }\n    ],\n    \"message\": \"Ocupación del parking obtenida exitosamente\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Crear Parking",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response time is within an acceptable range\", function () {",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);",
+											"});",
+											"",
+											"",
+											"pm.test(\"Response has the required fields\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData).to.have.property('details');",
+											"    pm.expect(responseData.details).to.have.property('id');",
+											"    pm.expect(responseData.details).to.have.property('isAvailable');",
+											"    pm.expect(responseData.details).to.have.property('createdAt');",
+											"    pm.expect(responseData.details).to.have.property('updatedAt');",
+											"    pm.expect(responseData.details).to.have.property('vehicle');",
+											"});",
+											"",
+											"",
+											"pm.test(\"Validate response properties\", function () {",
+											"    const responseData = pm.response.json();",
+											"    ",
+											"    pm.expect(responseData).to.be.an('object');",
+											"    pm.expect(responseData.details.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"ID should be a non-empty string\");",
+											"    pm.expect(responseData.details.isAvailable).to.be.a('boolean', \"isAvailable should be a boolean\");",
+											"    pm.expect(responseData.details.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/, \"createdAt should be in valid date format\");",
+											"    pm.expect(responseData.details.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/, \"updatedAt should be in valid date format\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/v2/parking/parkingExample",
+								"description": "###### Crear un Espacio de Estacionamiento\n\n```json\nMétodo: POST\nURL: /api/parking/:spaceId\nHeaders:\nAuthorization: Bearer <token>\n\n```\n\nParámetros\n\n```json\nspaceId: ID del nuevo espacio de estacionamiento a crear.\n\n```\n\n###### Respuesta Exitosa\n\n```json\n{\n  \"success\": true,\n  \"message\": \"Plaza de aparcamiento creada exitosamente\",\n  \"details\": {\n    \"parking_space_id\": \"string\"\n  }\n}\n```\n\n###### Respuesta de Error\n\n```json\n{\n  \"success\": false,\n  \"message\": \"Ya existe un parking con el mismo nombre\"\n}\n```\n\n#### Respuesta Fallida\n\n```json\n{\n  \"success\": false,\n  \"message\": \"Datos de reserva no proporcionados\"\n}\n```\n"
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar Parking",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"new_parking_space_id\": \"xdmax\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/v2/parking/minihacker123",
+								"description": "\n### Actualizar Espacio de Estacionamiento\n\n- **Método:** `PUT`\n\n- **URL:** `/api/parking/:spaceId`\n\n- Authorization: Bearer\n\n#### Parámetros\n\n- `spaceId`: ID del espacio de estacionamiento que se desea actualizar.\n\n#### Cuerpo de la Solicitud\n\n````json\n{\n  \"new_parking_space_id\": \"string\",\n  \"is_available\": true // opcional\n}\n#### Respuesta Exitosa\n\n```json\n{\n  \"success\": true,\n  \"message\": \"Plaza de aparcamiento modificada exitosamente\",\n  \"details\": {\n    \"parking_space_id\": \"string\",\n    \"is_available\": true,\n    \"reservations_count\": 0\n  }\n}\n````\n\n#### Respuesta de Error\n\n````json\n{\n  \"success\": false,\n  \"message\": \"No se pudo modificar la plaza\"\n}\n```"
+							},
+							"response": []
+						},
+						{
+							"name": "Eliminar Parking",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": "{{base_url}}/api/v2/parking/m5arc2Polo123",
+								"description": "### Eliminar Espacio de Estacionamiento\n\n- **Método:** `DELETE`\n\n- **URL:** `/api/parking/:spaceId`\n\n- Authorization: Bearer\n\n#### Parámetros\n\n- `spaceId`: ID del espacio de estacionamiento que se desea eliminar.\n\n#### Respuesta Exitosa\n\n```json\n{\n  \"success\": true,\n  \"message\": \"Plaza de aparcamiento eliminada exitosamente\"\n}\n```\n\n#### Respuesta de Error\n\n```json\n{\n  \"success\": false,\n  \"message\": \"No se pudo eliminar la plaza\"\n}\n```\n"
+							},
+							"response": []
+						}
+					],
+					"description": "Esta documentación describe los endpoints de la API para la gestión  \nde espacios de estacionamiento.\n\nLa API está construida usando Express.js y se accede a través de HTTP.\n\nSe requiere autenticación para todos los endpoints.\n\n## Autenticación\n\nTodos los endpoints requieren que el usuario esté autenticado y tenga  \nacceso de personal. Asegúrate de incluir un token de autenticación  \nválido en los encabezados de la solicitud."
+				}
+			]
+		},
+		{
+			"name": "Obtener Registros de Accesos",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v2/logs",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"logs"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "50",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Este endpoint realiza una solicitud HTTP GET para recuperar registros de la API. La solicitud no incluye un cuerpo de solicitud y la respuesta está en formato JSON con un código de estado de 200. La respuesta contiene una matriz de objetos de registro, cada uno con propiedades como _id, marca de tiempo, nivel, mensaje, userId, acción, recurso y detalles que incluyen userId, acción y descripción."
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{jwt_token}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxM2IzMzUyLTcwOTktNDVjNi1iZTFmLTEwY2YxZDRlY2Q3YiIsImlhdCI6MTcyOTg3OTE5MCwiZXhwIjoxNzYxNDE1MTkwfQ.jeaJLLXyjvc9TUeAUF9iggqLBMUTq8Uv3zYQSwaaQ3Y",
+			"type": "string"
+		}
+	]
+}
