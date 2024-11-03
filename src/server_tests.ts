@@ -1,4 +1,3 @@
-// server.js
 import { app } from './serverConfig'
 import http from 'http'
 import { checkDatabaseConnections, databaseRepository, databaseRepositoryMongo } from './controllers/controllers'
@@ -15,12 +14,11 @@ export const closeDatabaseConnections = async (): Promise<void> => {
   await databaseRepositoryMongo.closeConnection();
 }
 export const startServer = async (): Promise<http.Server> => {
-  if (!server) {
-    console.log('Iniciando el servidor...')
+  if (server === undefined) {
+    // para no contaminar el output de los tests
+    // console.log('Iniciando el servidor...')
     await checkDatabaseConnections()
-    server = app.listen(port, () => {
-      console.log(`Servidor de pruebas corriendo en puerto ${port}`)
-    })
+    server = app.listen(port)
   }
   return server
 }
