@@ -30,6 +30,7 @@ export default class ErrorHandler {
         defaultMessage = "Error interno del servidor"
         break
     }
+    // console.log('ErrorHandler: ', defaultMessage, code, error)
     return res.status(code).send({ message: defaultMessage, success: false })
   }
 }
