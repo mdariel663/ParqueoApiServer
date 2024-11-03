@@ -2,18 +2,39 @@ import IDatabase from '../Database/IDatabase'
 import VehiculoModel from '../Parking/VehiculesModel'
 import FechaModel, { FechaFormat } from '../Parking/FechaModel'
 import ReservaModelResponse from './ReservaModelResponse'
+import ReservaInterfaceUpdate from './ReservaInterfaceUpdate'
+import VehicleService from '../../services/VehicleService'
+import ReservaModelError from '../Errors/ReservaModelError'
 
 
 class ReservaModel {
+  static fromResponseObject(response: ReservaInterfaceUpdate): ReservaModel {
+    return new ReservaModel(
+      response.id,
+      response.user_id,
+      response.parking_space_id,
+      response.vehiculo,
+      response.start_time,
+      response.end_time,
+      response.created_at,
+      response.updated_at
+    )
+  }
   static async updateReserva(db: IDatabase, updatedReserva: ReservaModel): Promise<{ affectedRows: number }> {
+    if (updatedReserva.vehiculo instanceof VehiculoModel) {
+      const result = await VehicleService.checkIfVehicleExists(db, updatedReserva.vehiculo.plate)
+
+      if (result === false) {
+        await VehicleService.createVehicle(db, updatedReserva.vehiculo as VehiculoModel)
+      }
+    }
+    const plateNumber = updatedReserva.vehiculo instanceof VehiculoModel ? updatedReserva.vehiculo.plate : updatedReserva.vehiculo
     const result = await db.run(
       'UPDATE reservations SET user_id = ?, parking_space_id = ?, vehicle_id = ?, start_time = ?, end_time = ?, updated_at = ? WHERE id = ?',
       [
         updatedReserva.user_id,
         updatedReserva.parking_space_id,
-        typeof updatedReserva.vehiculo === 'string'
-          ? updatedReserva.vehiculo
-          : JSON.stringify(updatedReserva.vehiculo),
+        plateNumber,
         updatedReserva.start_time.toPrimitives(),
         updatedReserva.end_time.toPrimitives(),
         new Date(), // Set current date as updated_at

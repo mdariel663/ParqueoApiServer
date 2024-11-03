@@ -17,15 +17,18 @@ export default class ReservaController {
 
     static async updateReserva(req: Request, res: Response): Promise<Response> {
         const { reservationId } = req.params as { reservationId: string };
-        const { currentUserId, vehicleDetails, startTime, endTime } = req.body as unknown as {
+
+
+        const { currentUserId, startTime, endTime, vehiculo } = req.body as unknown as {
             currentUserId: UUID;
-            vehicleDetails: VehiculoPrimitives;
             startTime: string;
             endTime: string;
+            vehiculo?: VehiculoPrimitives;
         };
 
         try {
-            const errMessage = validateFields({ vehicleDetails, startTime, endTime });
+
+            const errMessage = validateFields({ startTime, endTime });
             if (errMessage !== null) {
                 throw new ParkingModelError(errMessage);
             }
@@ -37,20 +40,21 @@ export default class ReservaController {
                 throw new UserModelErrorAuth('Usuario no autenticado');
             }
 
-            const vehiculo = new VehiculoModel(vehicleDetails);
             const startDate = new FechaModel(startTime);
             const endDate = new FechaModel(endTime);
 
-            if (!vehiculo.isValid) {
-                throw new ParkingModelError('Datos del vehiculo no válidos');
-            } else if (!startDate.isValid || !endDate.isValid) {
-                throw new ParkingModelError('Datos de fecha no válidos');
-            } else if (startDate.fecha >= endDate.fecha) {
-                throw new ParkingModelError('La fecha de inicio debe ser anterior a la de terminación');
+            let vehiculoItem: VehiculoModel | null = null
+
+            if (vehiculo !== undefined) {
+                vehiculoItem = new VehiculoModel({ make: vehiculo.make, model: vehiculo.model, plate: vehiculo.plate })
+                if (vehiculoItem.isValid === false) {
+                    throw new ParkingModelError('Datos del vehiculo no válidos');
+                }
             }
 
             const reservasService = new ReservaService(databaseRepository);
-            const result = await reservasService.updateReserva(reservationId, vehiculo, startDate, endDate); // Assuming this method exists
+            const result = await reservasService.updateReserva(reservationId, vehiculoItem, startDate, endDate);
+
 
             if (result === null || result.success === false) {
                 throw new ParkingModelError(result?.message ?? 'No se pudo actualizar la reserva');

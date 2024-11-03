@@ -10,7 +10,7 @@ export default class ReservaModelResponse {
         readonly id: UUID,
         readonly user_id: UUID,
         readonly parking_space_id: string,
-        private readonly vehicle_id: string,
+        readonly vehicle_id: string,
         readonly created_at: Date,
         readonly updated_at: Date) {
         (async (): Promise<void> => {

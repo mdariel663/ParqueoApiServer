@@ -7,9 +7,10 @@ import ReservaModelResponse from '../models/Reservas/ReservaModelResponse'
 import LoggerController, { defaultEntryLog } from '../controllers/LoggerController'
 import ParkingModelError from '../models/Errors/ParkingModelError'
 import ReservaParkingSpaceCreate from '../models/Reservas/ReservaParkingSpaceCreate'
+import ReservaInterfaceUpdate from '../models/Reservas/ReservaInterfaceUpdate'
 
 class ReservaService {
-  async updateReserva(reservaId: string, vehiculo: VehiculoModel, startDate: FechaModel, endDate: FechaModel): Promise<ReservaParkingSpaceCreate> {
+  async updateReserva(reservaId: string, vehiculo: VehiculoModel | null, startDate: FechaModel, endDate: FechaModel): Promise<ReservaParkingSpaceCreate> {
 
 
     const existingReserva = await ReservaModel.getReservaById(this.db, reservaId);
@@ -17,7 +18,7 @@ class ReservaService {
       throw new ParkingModelError('No se puede editar una reserva que no existe');
     }
 
-    if (!vehiculo.isValid) {
+    if (vehiculo !== null && !vehiculo.isValid) {
       throw new ParkingModelError('Datos del vehículo no válidos');
     } else if (!startDate.isValid || !endDate.isValid) {
       throw new ParkingModelError('Datos de fecha no válidos');
@@ -25,17 +26,28 @@ class ReservaService {
       throw new ParkingModelError('La fecha de inicio debe ser anterior a la de terminación');
     }
 
-    const updatedReserva = new ReservaModel(
-      reservaId,
-      existingReserva.user_id,
-      existingReserva.parking_space_id,
-      vehiculo,
-      startDate,
-      endDate,
-      existingReserva.created_at,
-      new Date()
-    );
 
+    if (vehiculo === null) {
+      vehiculo = await VehiculoModel.getVehiculoByPlate(this.db, existingReserva.vehicle_id) ?? null
+      if (vehiculo === null) {
+        throw new ParkingModelError('No se puede obtener el vehículo asociado a la reserva')
+      }
+    }
+    console.log('vehiculo', vehiculo)
+
+
+    const updated = {
+      id: reservaId,
+      user_id: existingReserva.user_id,
+      parking_space_id: existingReserva.parking_space_id,
+      vehiculo: vehiculo,
+      start_time: startDate,
+      end_time: endDate,
+      created_at: existingReserva.created_at,
+      updated_at: new Date()
+    } as unknown as ReservaInterfaceUpdate
+
+    const updatedReserva = ReservaModel.fromResponseObject(updated)
     const result = await ReservaModel.updateReserva(this.db, updatedReserva);
 
     if (result.affectedRows === 0) {

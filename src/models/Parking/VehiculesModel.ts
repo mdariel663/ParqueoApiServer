@@ -50,7 +50,7 @@ class VehiculoModel {
     }
   }
 
-  private readonly fromPrimitives = ({ make, model, plate }: VehiculoPrimitives): void => {
+  fromPrimitives = ({ make, model, plate }: VehiculoPrimitives): void => {
     if (!make || !model || !plate) {
       this.isValid = false
       return
