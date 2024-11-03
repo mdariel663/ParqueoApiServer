@@ -156,7 +156,6 @@ BEGIN
 END $$
 
 
-
 CREATE PROCEDURE IF NOT EXISTS apiParqueo.AddReservation(
     IN reservation_id VARCHAR(64),
     IN user_id VARCHAR(64),
@@ -178,29 +177,34 @@ BEGIN
     SET vehicle_model = JSON_UNQUOTE(JSON_EXTRACT(vehicle_json, '$.model'));
     SET vehicle_plate = JSON_UNQUOTE(JSON_EXTRACT(vehicle_json, '$.plate'));
 
-    
-    
     -- Verifica si el vehículo ya existe
     SELECT plate INTO existing_vehicle_id
     FROM vehicles
     WHERE plate = vehicle_plate;
 
-    -- Si ya existe, genera un error
+    -- Si ya existe, verifica reservas existentes
     IF existing_vehicle_id IS NOT NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La matrícula ya está registrada.';
+        SELECT COUNT(*) INTO available_space_count
+        FROM reservations
+        WHERE vehicle_id = existing_vehicle_id
+        AND (start_time < end_time AND end_time > start_time);
+
+        IF available_space_count > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El vehículo ya está reservado en el intervalo de tiempo indicado.';
+        END IF;
+    ELSE
+        -- Inserta el nuevo vehículo si no existe
+        INSERT INTO vehicles (make, model, plate, created_at, updated_at)
+        VALUES (vehicle_make, vehicle_model, vehicle_plate, NOW(), NOW());
+        SET existing_vehicle_id = LAST_INSERT_ID(); -- Obtener el ID del vehículo recién insertado
     END IF;
-
-    -- Si no existe, se inserta el nuevo vehículo
-    INSERT INTO vehicles (make, model, plate, created_at, updated_at)
-    VALUES (vehicle_make, vehicle_model, vehicle_plate, NOW(), NOW());
-
 
     -- Verifica que la hora de inicio no esté en el pasado
     IF start_time < NOW() THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se pueden hacer reservas en el pasado.';
     END IF;
 
-    -- Verifica si el espacio de estacionamiento está disponible para el período solicitado, sin afectar el estado actual
+    -- Verifica disponibilidad del espacio de estacionamiento
     SELECT COUNT(*) INTO available_space_count
     FROM parking_spaces ps
     WHERE ps.id = parking_space_id
@@ -211,28 +215,29 @@ BEGIN
         AND (r.start_time < end_time AND r.end_time > start_time)
     );
 
-    -- Verifica si existen reservas anteriores en el mismo espacio
+    -- Verifica reservas anteriores en el mismo espacio
     SELECT EXISTS (
         SELECT 1 FROM reservations
         WHERE parking_space_id = parking_space_id
         AND end_time < start_time
     ) INTO has_prior_reservations;
 
-    -- Si hay un espacio disponible para el futuro, realiza la reserva
+    -- Realiza la reserva si hay espacio disponible
     IF available_space_count > 0 THEN
         INSERT INTO reservations (id, user_id, parking_space_id, vehicle_id, start_time, end_time, created_at, updated_at)
-        VALUES (reservation_id, user_id, parking_space_id, vehicle_plate, start_time, end_time, NOW(), NOW());
+        VALUES (reservation_id, user_id, parking_space_id, existing_vehicle_id, start_time, end_time, NOW(), NOW());
 
-        -- Si no hay reservas anteriores, marca el espacio como no disponible actualmente
+        -- Marca el espacio como no disponible si no hay reservas anteriores
         IF has_prior_reservations = FALSE THEN
             UPDATE parking_spaces
-            SET is_available = FALSE, vehicle_id = vehicle_plate, updated_at = NOW()
+            SET is_available = FALSE, vehicle_id = existing_vehicle_id, updated_at = NOW()
             WHERE id = parking_space_id;
         END IF;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No hay espacios disponibles para la reserva solicitada en el período indicado.';
     END IF;
-END $$
+END $$ 
+
 
 CREATE PROCEDURE IF NOT EXISTS apiParqueo.DeleteReservation(
     IN reservation_id VARCHAR(64)
@@ -259,7 +264,6 @@ BEGIN
     END IF;
 
 END $$
-
 
 
 CREATE PROCEDURE IF NOT EXISTS apiParqueo.UpdateParkingSpaceInfo(
