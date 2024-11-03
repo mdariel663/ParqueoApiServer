@@ -4,7 +4,6 @@ import FechaModel, { FechaFormat } from '../Parking/FechaModel'
 import ReservaModelResponse from './ReservaModelResponse'
 import ReservaInterfaceUpdate from './ReservaInterfaceUpdate'
 import VehicleService from '../../services/VehicleService'
-import ReservaModelError from '../Errors/ReservaModelError'
 
 
 class ReservaModel {
