@@ -2,6 +2,7 @@ import { Response } from 'express'
 import ParkingModelError from '../models/Errors/ParkingModelError'
 import TokenModelError from '../models/Errors/TokenModelError'
 import UserModelError, { UserModelErrorAuth } from '../models/Errors/UserModelError'
+import ReservaModelError from '../models/Errors/ReservaModelError'
 
 export default class ErrorHandler {
   static handleError = (
@@ -11,6 +12,10 @@ export default class ErrorHandler {
     code = 500
   ): Response => {
     switch (true) {
+      case error instanceof ReservaModelError:
+        code = 400
+        defaultMessage = error.message
+        break;
       case error instanceof TokenModelError:
         code = 401
         defaultMessage = error.message
@@ -30,7 +35,7 @@ export default class ErrorHandler {
         defaultMessage = "Error interno del servidor"
         break
     }
-    // console.log('ErrorHandler: ', defaultMessage, code, error)
+    console.log('ErrorHandler: ', defaultMessage, code, error)
     return res.status(code).send({ message: defaultMessage, success: false })
   }
 }

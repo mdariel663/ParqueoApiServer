@@ -105,6 +105,7 @@ class ParkingService {
       if (err.sqlMessage && err.code === 'ER_SIGNAL_EXCEPTION') {
         throw new ReservaModelError(err.sqlMessage)
       } else {
+        console.log("OMG: ", error)
         throw new ReservaModelError('Error al procesar la reserva')
       }
     }

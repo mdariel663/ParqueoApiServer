@@ -1,7 +1,7 @@
 import { FechaFormat } from "../Parking/FechaModel"
 
 export default interface ReservaParkingSpaceCreate {
-    success: boolean, message: string, detalles: {
+    success: boolean, message: string, details: {
         id: string,
         user_id: string,
         parking_space_id: string,

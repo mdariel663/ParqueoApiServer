@@ -147,8 +147,8 @@ export default class ReservaController {
             }
             if (result.success) {
                 const dataReserva = {
-                    parking_space_id: result.detalles.parking_space_id,
-                    vehicleData: result.detalles.vehiculo ?? null
+                    parking_space_id: result.details.parking_space_id,
+                    vehicleData: result.details.vehiculo ?? null
                 }
                 LoggerController.sendReserva(userId as string, dataReserva, true)
             }

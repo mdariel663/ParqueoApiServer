@@ -7,7 +7,7 @@ interface LogEntry {
   userId?: UUID; // ID del usuario involucrado, si aplica
   action?: string; // Acción realizada, por ejemplo, 'reserve', 'update', 'login', etc.
   resource?: string; // Recurso afectado, por ejemplo, 'parking_slot', 'user', etc.
-  details?: object; // Detalles adicionales (opcional), como el payload de la solicitud o el error
+  details?: object; // details adicionales (opcional), como el payload de la solicitud o el error
   ipAddress?: string; // Dirección IP del cliente que realiza la solicitud
 }
 

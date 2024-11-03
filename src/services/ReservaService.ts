@@ -70,7 +70,7 @@ class ReservaService {
     return {
       success: true,
       message: 'Reserva actualizada con éxito',
-      detalles: updatedReserva.toJSON()
+      details: updatedReserva.toJSON()
     };
   }
 
@@ -134,7 +134,7 @@ class ReservaService {
     return {
       success: true,
       message: 'Reserva realizada con éxito',
-      detalles: reserva.toJSON()
+      details: reserva.toJSON()
     }
   }
 
